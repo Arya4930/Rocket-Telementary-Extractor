@@ -38,3 +38,9 @@ npm start
 > The script processes every frame of the video, which can take a considerable amount of time.
 
 > Make sure your Azure Vision API key has the necessary permissions and quotas for the volume of requests you’re making.
+
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
