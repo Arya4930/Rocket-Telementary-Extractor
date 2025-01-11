@@ -6,6 +6,7 @@ build/
 
 # Ignore Data of flights ( Available on Website soon )
 data/
+video-dataset/
 
 # Ignore IDE and editor files
 .vscode/

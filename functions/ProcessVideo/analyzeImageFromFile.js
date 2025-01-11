@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const createClient = require('@azure-rest/ai-vision-image-analysis').default;
-const { AzureKeyCredential } = require('@azure/core-auth');
-const Vehicles = require('../vehicles')
+import fs from 'fs';
+import CreateClient from '@azure-rest/ai-vision-image-analysis';
+const createClient = CreateClient.default;
+import { AzureKeyCredential } from '@azure/core-auth';
+import Vehicles from './vehicles.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -10,7 +10,7 @@ const vehicleInstances = new Vehicles()
 
 const features = ['Read'];
 
-async function analyzeImageFromFile(imagePath) {
+export default async function analyzeImageFromFile(imagePath) {
     try {
         const imageData = fs.readFileSync(imagePath);
 
@@ -37,7 +37,7 @@ async function analyzeImageFromFile(imagePath) {
                     }))
                 )
             );
-            a = []
+            let a = []
             words.filter(word => {
                 return (word.boundingPolygon[2].x < 400 && word.boundingPolygon[2].y < 1100)
             }).map(word => {
@@ -78,5 +78,3 @@ async function analyzeImageFromFile(imagePath) {
         console.error('Error analyzing image:', error);
     }
 }
-
-module.exports = analyzeImageFromFile

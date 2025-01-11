@@ -1,5 +1,5 @@
-const fs = require('fs')
-const xl = require('excel4node')
+import fs from 'fs';
+import xl from 'excel4node';
 
 const VerifySpeed = (jsonData, rowIndex, type) => {
     let verifiedSpeed = type === 'Booster' ? jsonData[rowIndex].booster_speed : jsonData[rowIndex].ship_speed;
@@ -41,7 +41,7 @@ const VerifyAltitude = (jsonData, rowIndex, type) => {
     return verifiedAltitude;
 };
 
-const getExcelSheet = (sheet) => {
+export default function getExcelSheet (sheet) {
     const jsonData = JSON.parse(fs.readFileSync(sheet, 'utf8'));
 
     const wb = new xl.Workbook();
@@ -114,5 +114,3 @@ const getExcelSheet = (sheet) => {
         }
     });
 }
-
-module.exports = getExcelSheet;
