@@ -1,6 +1,6 @@
-const ffmpeg = require('fluent-ffmpeg')
+import ffmpeg from 'fluent-ffmpeg';
 
-function extractFrames(videopath) {
+export default async function extractFrames(videopath) {
     return new Promise((resolve, reject) => {
         ffmpeg(videopath)
             .videoFilters('fps=1')
@@ -19,5 +19,3 @@ function extractFrames(videopath) {
             .run();
     });
 }
-
-module.exports = extractFrames;
