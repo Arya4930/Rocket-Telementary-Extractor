@@ -16,8 +16,6 @@ const argv = minimist(process.argv.slice(2));
 
 const directoryPath = './video-dataset'
 const outputFilePath = './results.json'
-console.log(directoryPath);
-console.log(outputFilePath);
 
 let videoPath;
 const rocketType = argv.r || 'Starship';
