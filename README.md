@@ -1,0 +1,39 @@
+# Rocket Telemetry Extractor
+
+## Currently works only for Starship, support for Falcon-9 and other rockets in progress
+
+This project leverages the Azure Vision API to extract text from video frames, achieving a high accuracy of ~99.4%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour video).
+
+## Requirements
+
+Before running the script, you need an Azure Vision API key. After getting your key follow these steps:
+
+1. **Create an .env file** in the root directory of the project.
+2. Add the following lines to the .env file, replacing <your-vision-key> with your actual Azure Vision API key:
+
+```bash
+   VISION_ENDPOINT="https://ai-ocr-testing.cognitiveservices.azure.com/"
+   VISION_KEY="<your-vision-key>"
+```
+
+3. Download the launch video (link support coming soon) and place it in the /video-dataset folder.
+
+# Installation
+Make sure you have Node.js installed, then follow these steps:
+
+1. ### Install dependencies:
+
+```bash
+npm install
+```
+
+2. ### Run the script:
+Once you’ve placed the video file in the video-dataset folder and configured the .env file, run the following command to start the script:
+
+```bash
+npm start
+```
+
+## Notes
+The script processes every frame of the video, which can take a considerable amount of time.
+Make sure your Azure Vision API key has the necessary permissions and quotas for the volume of requests you’re making.
