@@ -1,6 +1,6 @@
 # Rocket Telemetry Extractor
 
-### Currently works only for Starship, support for Falcon-9 and other rockets in progress
+### Currently works only for Starship. Support for Falcon-9 and other rockets in progress
 
 This project leverages the Azure Vision API to extract text from video frames, achieving a high accuracy of ~99.4%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour video).
 
