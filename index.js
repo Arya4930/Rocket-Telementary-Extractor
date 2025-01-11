@@ -1,12 +1,12 @@
 import ffmpegPath from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import 'dotenv/config';
-import getExcelSheet from './functions/getExcelSheet.js';
-import extractFrames from './functions/getVideo/extractframes.js';
-import processImages from './functions/ProcessVideo/processImages.js';
-import getFirstMp4File from './functions/getVideo/getvidfile.js';
+import getExcelSheet from './getExcelSheet.js';
+import extractFrames from './getVideo/extractframes.js';
+import processImages from './ProcessVideo/processImages.js';
+import getFirstMp4File from './getVideo/getvidfile.js';
 import path from 'path';
-import DownloadVideo from './functions/getVideo/downloadvideo.js';
+import DownloadVideo from './getVideo/downloadvideo.js';
 
 ffmpeg.setFfmpegPath(ffmpegPath.path);
 
@@ -35,7 +35,7 @@ async function main() {
             const outputVideoPath = path.join(__dirname, 'video-dataset', 'launch-footage.mp4');
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
-        // await extractFrames(videoPath);
+        await extractFrames(videoPath);
         await processImages(directoryPath, outputFilePath);
         getExcelSheet(outputFilePath);
     } catch (err) {
