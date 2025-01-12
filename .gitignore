@@ -33,7 +33,6 @@ secrets.json
 # Ignore data files such as .mp4, .png, .json, .xls etc.
 *.mp4
 *.png
-*.json
 *.xls
 
 # Ignore package-lock.json for npm
