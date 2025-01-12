@@ -16,8 +16,6 @@ Before running the script, you need an Azure Vision API key. After getting your 
    VISION_KEY="<your-vision-key>"
 ```
 
-3. Download the launch video (link support coming soon) and place it in the /video-dataset folder.
-
 # Installation
 Make sure you have Node.js installed, then follow these steps:
 

@@ -7,6 +7,7 @@ import processImages from './ProcessVideo/processImages.js';
 import getFirstMp4File from './getVideo/getvidfile.js';
 import path from 'path';
 import DownloadVideo from './getVideo/downloadvideo.js';
+import fs from 'fs';
 
 ffmpeg.setFfmpegPath(ffmpegPath.path);
 
@@ -34,7 +35,10 @@ async function main() {
             const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage.mp4');
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
-        await extractFrames(videoPath);
+        const files = await fs.promises.readdir(directoryPath)
+        if(!files.some(file => file.startsWith('frame_'))){
+            await extractFrames(videoPath);
+        }
         await processImages(directoryPath, outputFilePath);
         getExcelSheet(outputFilePath);
     } catch (err) {
