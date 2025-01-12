@@ -12,6 +12,7 @@ export default async function processImages(directoryPath, outputFilePath) {
         const data = await analyzeImageFromFile(filePath);
         if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
             console.log(`No data found for ${filePath}. Skipping...`);
+            fs.unlinkSync(filePath);
             continue;
         }
         results.push({ file: file, ...data });

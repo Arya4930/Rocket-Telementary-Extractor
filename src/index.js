@@ -13,6 +13,7 @@ ffmpeg.setFfmpegPath(ffmpegPath.path);
 import minimist from 'minimist';
 
 const argv = minimist(process.argv.slice(2));
+const __dirname = import.meta.dirname;
 
 const directoryPath = './video-dataset'
 const outputFilePath = './results.json'
@@ -30,7 +31,7 @@ async function main() {
     try {
         if( /^https?:\/\//.test(videoPath)) {
             let videoLink = videoPath;
-            const outputVideoPath = path.join(__dirname, 'video-dataset', 'launch-footage.mp4');
+            const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage');
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
         await extractFrames(videoPath);
