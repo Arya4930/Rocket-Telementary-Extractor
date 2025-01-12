@@ -1,4 +1,10 @@
-# Rocket Telemetry Extractor
+<div align="center">
+	<br />
+	<p>
+		<img src="https://github.com/user-attachments/assets/24023511-022d-4fd3-a0a3-187d1d714dfa" width="546" alt="logo" />
+	</p>
+	<br />
+</div>
 
 ### Currently works only for Starship. Support for Falcon-9 and other rockets in progress
 
