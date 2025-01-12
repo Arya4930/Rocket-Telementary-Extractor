@@ -47,6 +47,6 @@ export default async function DownloadVideo(videoURL, outputPath) {
             console.log(`Video saved to ${outputPath}`);
         });
     } catch (err) {
-        console.error('Download failed:', error.message);
+        console.error('Download failed:', err.message);
     }
 }

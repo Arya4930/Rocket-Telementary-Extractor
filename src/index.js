@@ -31,10 +31,10 @@ async function main() {
     try {
         if( /^https?:\/\//.test(videoPath)) {
             let videoLink = videoPath;
-            const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage');
+            const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage.mp4');
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
-        await extractFrames(videoPath);
+        // await extractFrames(videoPath);
         await processImages(directoryPath, outputFilePath);
         getExcelSheet(outputFilePath);
     } catch (err) {

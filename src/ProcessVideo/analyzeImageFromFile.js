@@ -3,6 +3,7 @@ import CreateClient from '@azure-rest/ai-vision-image-analysis';
 const createClient = CreateClient.default;
 import { AzureKeyCredential } from '@azure/core-auth';
 import Vehicles from './vehicles.js';
+import TimeFormat from 'hh-mm-ss';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -64,12 +65,18 @@ export default async function analyzeImageFromFile(imagePath) {
             //     }
             // });
 
+            let plustime;
+
             await words.forEach(word => {
                 if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
                     time = word.text.substring(2)
+                } 
+                if ( /^T\-\d{2}:\d{2}:\d{2}$/.test(word.text)){
+                    const t = word.text.substring(2).split(':').map(e => Number(e))
+                    plustime = t[0]*3600 + t[1]*60 + t[2]
                 }
             });
-
+            if (plustime) return plustime;
             if (!time) return;
 
             return vehicleInstances.starship(words, time)
