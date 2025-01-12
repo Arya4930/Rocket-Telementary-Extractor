@@ -34,7 +34,7 @@ async function main() {
             const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage.mp4');
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
-        // await extractFrames(videoPath);
+        await extractFrames(videoPath);
         await processImages(directoryPath, outputFilePath);
         getExcelSheet(outputFilePath);
     } catch (err) {
