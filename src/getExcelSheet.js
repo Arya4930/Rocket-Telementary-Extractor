@@ -98,10 +98,10 @@ export default function getExcelSheet(sheet) {
         'Booster_Speed ( m/s )',
         'Booster_Acceleration ( m/s^2 )',
         'Booster_Altitude ( KM )',
-        'Ship_Speed',
+        'Ship_Speed ( Km/Hr )',
         'Ship_speed( m/s )',
-        'Ship_Acceleration ( KM )',
-        'Ship_Altitude ( m/s^2 )'
+        'Ship_Acceleration ( m/s^2 )',
+        'Ship_Altitude ( KM )'
     ];
     headers.forEach((header, index) => {
         ws.cell(1, index + 1)
