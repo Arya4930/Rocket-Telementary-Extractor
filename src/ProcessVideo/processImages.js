@@ -11,6 +11,7 @@ export default async function processImages(directoryPath, outputFilePath) {
     const results = [];
 
     let skipcount = 0
+    let InCommingData = false
 
     for (const file of files) {
         const filePath = path.join(directoryPath, file);
@@ -29,11 +30,12 @@ export default async function processImages(directoryPath, outputFilePath) {
             console.log(`No data found for ${filePath}. Skipping...`);
             fs.unlinkSync(filePath);
             continue;
-        } else if ( isInt(data) ){
+        } else if ( isInt(data) && InCommingData == false ){
             skipcount = data-1;
             console.log(`Skipping the next ${data} files...`);
         }
         results.push({ file: file, ...data });
+        InCommingData = true;
     }
 
     fs.writeFileSync(outputFilePath, JSON.stringify(results, null, 2));
