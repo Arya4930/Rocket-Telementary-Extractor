@@ -30,10 +30,10 @@ export default async function DownloadVideo(videoURL, outputPath) {
 
         return new Promise((resolve, reject) => {
             let ytDlpEventEmitter = ytDlpWrap
-                .exec([
-                    videoURL, '-f', 'best', '-o', outputPath
-                ])
-                .on('ytDlpEvent', (eventType, eventData) => console.log(eventType, eventData))
+                .exec([videoURL, '-f', 'best', '-o', outputPath])
+                .on('ytDlpEvent', (eventType, eventData) =>
+                    console.log(eventType, eventData)
+                )
                 .on('error', (error) => {
                     console.error('Download failed due to error:', error);
                     reject(error);
@@ -43,7 +43,9 @@ export default async function DownloadVideo(videoURL, outputPath) {
                     resolve(outputPath);
                 });
 
-            console.log(`yt-dlp process PID: ${ytDlpEventEmitter.ytDlpProcess.pid}`);
+            console.log(
+                `yt-dlp process PID: ${ytDlpEventEmitter.ytDlpProcess.pid}`
+            );
             console.log(`Video saved to ${outputPath}`);
         });
     } catch (err) {

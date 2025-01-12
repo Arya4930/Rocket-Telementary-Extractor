@@ -6,14 +6,14 @@ class Vehicles {
         this.ship_altitude = 0;
     }
 
-    starship(words, time){
+    starship(words, time) {
         if (words[0].text !== 'SPEED') {
             words.shift();
         }
         this.booster_speed = parseInt(words[1].text) || 0;
 
-        const timeParts = time.split(":")
-        const hours = parseInt(timeParts[0], 10)
+        const timeParts = time.split(':');
+        const hours = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         const seconds = parseInt(timeParts[2], 10);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
@@ -27,9 +27,8 @@ class Vehicles {
 
         if (totalSeconds < 150) {
             this.ship_altitude = this.booster_altitude;
-            this.ship_speed = this.booster_speed
+            this.ship_speed = this.booster_speed;
         } else {
-
             for (let i = 0; i < words.length; i++) {
                 if (words[i].text === 'ALTITUDE' && words[i + 1]) {
                     this.ship_altitude = words[i + 1].text;
@@ -55,9 +54,9 @@ class Vehicles {
         console.log(telemetryData);
         return telemetryData;
     }
-    falcon9(words, time){
+    falcon9(words, time) {
         // code
     }
 }
 
-export default Vehicles
+export default Vehicles;

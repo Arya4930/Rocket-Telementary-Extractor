@@ -16,27 +16,33 @@ import minimist from 'minimist';
 const argv = minimist(process.argv.slice(2));
 const __dirname = import.meta.dirname;
 
-const directoryPath = './video-dataset'
-const outputFilePath = './results.json'
+const directoryPath = './video-dataset';
+const outputFilePath = './results.json';
 
 let videoPath;
 const rocketType = argv.r || 'Starship';
 
 async function main() {
-    videoPath = argv.v || (await getFirstMp4File(directoryPath))
+    videoPath = argv.v || (await getFirstMp4File(directoryPath));
     if (!videoPath) {
-        console.error('No video provided and no MP4 files found in the video-dataset folder.');
+        console.error(
+            'No video provided and no MP4 files found in the video-dataset folder.'
+        );
         return;
     }
     console.log(`Using video: ${videoPath}`);
     try {
-        if( /^https?:\/\//.test(videoPath)) {
+        if (/^https?:\/\//.test(videoPath)) {
             let videoLink = videoPath;
-            const outputVideoPath = path.join(__dirname, '../video-dataset','launch-footage.mp4');
+            const outputVideoPath = path.join(
+                __dirname,
+                '../video-dataset',
+                'launch-footage.mp4'
+            );
             videoPath = await DownloadVideo(videoLink, outputVideoPath);
         }
-        const files = await fs.promises.readdir(directoryPath)
-        if(!files.some(file => file.startsWith('frame_'))){
+        const files = await fs.promises.readdir(directoryPath);
+        if (!files.some((file) => file.startsWith('frame_'))) {
             await extractFrames(videoPath);
         }
         await processImages(directoryPath, outputFilePath);
