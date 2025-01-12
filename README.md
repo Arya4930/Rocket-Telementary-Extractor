@@ -26,8 +26,12 @@ npm install
 ```
 
 2. ### Run the script:
-Once you’ve placed the video file in the video-dataset folder and configured the .env file, run the following command to start the script:
+There are 2 ways you can run the script. Either you can get the link of the video and run
 
+```bash
+node src/index.js -v "<your-video-link-here>"
+```
+or you can download the video yourself and shorten it down to be just the launch footage, place it in `video-dataset` folder and simply run the command
 ```bash
 npm start
 ```
