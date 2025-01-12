@@ -22,5 +22,8 @@
     "hh-mm-ss": "^1.2.0",
     "minimist": "^1.2.8",
     "yt-dlp-wrap": "^2.3.12"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
   }
 }
