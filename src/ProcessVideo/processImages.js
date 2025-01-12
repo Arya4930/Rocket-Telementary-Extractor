@@ -31,7 +31,7 @@ export default async function processImages(directoryPath, outputFilePath) {
             fs.unlinkSync(filePath);
             continue;
         } else if ( isInt(data) && InCommingData == false ){
-            skipcount = data-1;
+            skipcount = data - 5;
             console.log(`Skipping the next ${data} files...`);
         }
         results.push({ file: file, ...data });
