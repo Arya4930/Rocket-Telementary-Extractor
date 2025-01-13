@@ -1,3 +1,4 @@
+import analyzeImage from '../fuelbar-percentage';
 class Vehicles {
     constructor() {
         this.booster_speed = 0;
@@ -6,7 +7,8 @@ class Vehicles {
         this.ship_altitude = 0;
     }
 
-    starship(words, time) {
+    starship(words, time, imagePath) {
+        analyzeImage(imagePath);
         if (words[0].text !== 'SPEED') {
             words.shift();
         }
