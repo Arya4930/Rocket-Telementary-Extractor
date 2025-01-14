@@ -98,10 +98,14 @@ export default function getExcelSheet(sheet) {
         'Booster_Speed ( m/s )',
         'Booster_Acceleration ( m/s^2 )',
         'Booster_Altitude ( KM )',
+        'Booster_LOX_Percent',
+        'Booster_CH4_Percent',
         'Ship_Speed ( Km/Hr )',
         'Ship_speed( m/s )',
         'Ship_Acceleration ( m/s^2 )',
-        'Ship_Altitude ( KM )'
+        'Ship_Altitude ( KM )',
+        'Ship_LOX_Percent',
+        'Ship_CH4_Percent'
     ];
     headers.forEach((header, index) => {
         ws.cell(1, index + 1)
@@ -167,26 +171,58 @@ export default function getExcelSheet(sheet) {
         }
 
         ws.cell(rowIndex + 2, 2).number(
-            isNaN(booster_speed) ? 0 : booster_speed
+            booster_speed === null || isNaN(booster_speed) ? 0 : booster_speed
         );
         ws.cell(rowIndex + 2, 3).number(
-            isNaN(booster_speedinms) ? 0 : booster_speedinms
+            booster_speedinms === null || isNaN(booster_speedinms)
+                ? 0
+                : booster_speedinms
         );
         ws.cell(rowIndex + 2, 4).number(
-            isNaN(booster_acceleration) ? 0 : booster_acceleration
+            booster_acceleration === null || isNaN(booster_acceleration)
+                ? 0
+                : booster_acceleration
         );
         ws.cell(rowIndex + 2, 5).number(
-            isNaN(booster_altitude) ? 0 : booster_altitude
+            booster_altitude === null || isNaN(booster_altitude)
+                ? 0
+                : booster_altitude
         );
-        ws.cell(rowIndex + 2, 6).number(isNaN(ship_speed) ? 0 : ship_speed);
+        ws.cell(rowIndex + 2, 6).number(
+            item.booster_LOX_Percent === null || isNaN(item.booster_LOX_Percent)
+                ? 0
+                : item.booster_LOX_Percent
+        );
         ws.cell(rowIndex + 2, 7).number(
-            isNaN(ship_speedinms) ? 0 : ship_speedinms
+            item.booster_CH4_Percent === null || isNaN(item.booster_CH4_Percent)
+                ? 0
+                : item.booster_CH4_Percent
         );
         ws.cell(rowIndex + 2, 8).number(
-            isNaN(ship_acceleration) ? 0 : ship_acceleration
+            ship_speed === null || isNaN(ship_speed) ? 0 : ship_speed
         );
         ws.cell(rowIndex + 2, 9).number(
-            isNaN(ship_altitude) ? 0 : ship_altitude
+            ship_speedinms === null || isNaN(ship_speedinms)
+                ? 0
+                : ship_speedinms
+        );
+        ws.cell(rowIndex + 2, 10).number(
+            ship_acceleration === null || isNaN(ship_acceleration)
+                ? 0
+                : ship_acceleration
+        );
+        ws.cell(rowIndex + 2, 11).number(
+            ship_altitude === null || isNaN(ship_altitude) ? 0 : ship_altitude
+        );
+        ws.cell(rowIndex + 2, 12).number(
+            item.ship_LOX_Percent === null || isNaN(item.ship_LOX_Percent)
+                ? 0
+                : item.ship_LOX_Percent
+        );
+        ws.cell(rowIndex + 2, 13).number(
+            item.ship_CH4_Percent === null || isNaN(item.ship_CH4_Percent)
+                ? 0
+                : item.ship_CH4_Percent
         );
     });
 

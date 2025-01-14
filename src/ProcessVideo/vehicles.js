@@ -4,17 +4,15 @@ class Vehicles {
         this.booster_altitude = 0;
         this.ship_speed = 0;
         this.ship_altitude = 0;
-        // this.boosterloxPercent = 100;
-        // this.boosterch4Percent = 100;
-        // this.shiploxPercent = 100;
-        // this.shipch4Percent = 100;
+        this.boosterloxPercent = 100.0;
+        this.boosterch4Percent = 100.0;
+        this.shiploxPercent = 100.0;
+        this.shipch4Percent = 100.0;
     }
 
     starship(words, time, shipFuel, BoosterFuel) {
-        const boosterfuel = BoosterFuel.split(' ');
+        const boosterfuel = BoosterFuel.split('\r\n');
         console.log(boosterfuel);
-        // this.boosterloxPercent = boosterfuel[0];
-        // this.boosterch4Percent = boosterfuel[1];
 
         if (words[0].text !== 'SPEED') {
             words.shift();
@@ -37,11 +35,23 @@ class Vehicles {
         if (totalSeconds < 150) {
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
-            // this.shiploxPercent = 100;
-            // this.shipch4Percent = 100;
+            this.boosterloxPercent = parseFloat(
+                parseFloat(boosterfuel[0]).toFixed(2)
+            );
+            this.boosterch4Percent = parseFloat(
+                parseFloat(boosterfuel[1]).toFixed(2)
+            );
+            this.shiploxPercent = 100.0;
+            this.shipch4Percent = 100.0;
         } else {
-            this.shiploxPercent = shipFuel.split()[0];
-            this.shipch4Percent = shipFuel.split()[1];
+            const ShipFuel = shipFuel.split('\r\n');
+            console.log(shipFuel);
+            this.shiploxPercent = parseFloat(
+                parseFloat(ShipFuel[0]).toFixed(2)
+            );
+            this.shipch4Percent = parseFloat(
+                parseFloat(ShipFuel[1]).toFixed(2)
+            );
             for (let i = 0; i < words.length; i++) {
                 if (words[i].text === 'ALTITUDE' && words[i + 1]) {
                     this.ship_altitude = words[i + 1].text;
@@ -58,19 +68,20 @@ class Vehicles {
             time: time || 'Not found',
             ship_speed: parseInt(this.ship_speed) || 0,
             ship_altitude: parseInt(this.ship_altitude) || 0,
-            // ship_LOX_Percent: parseInt(this.shiploxPercent) || 0,
-            // ship_CH4_Percent: parseInt(this.shipch4Percent) || 0,
+            ship_LOX_Percent: this.shiploxPercent,
+            ship_CH4_Percent: this.shipch4Percent,
             ...(totalSeconds <= 480 && {
                 booster_speed: parseInt(this.booster_speed) || 0,
-                booster_altitude: parseInt(this.booster_altitude) || 0
-                // booster_LOX_Percent: parseInt(this.boosterloxPercent) || 0,
-                // booster_CH4_Percent: parseInt(this.boosterch4Percent) || 0
+                booster_altitude: parseInt(this.booster_altitude) || 0,
+                booster_LOX_Percent: this.boosterloxPercent,
+                booster_CH4_Percent: this.boosterch4Percent
             })
         };
 
         console.log(telemetryData);
         return telemetryData;
     }
+
     falcon9(words, time) {
         // code
     }

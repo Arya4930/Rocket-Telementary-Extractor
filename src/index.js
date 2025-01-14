@@ -45,7 +45,7 @@ async function main() {
         if (!files.some((file) => file.startsWith('frame_'))) {
             await extractFrames(videoPath);
         }
-        await processImages(directoryPath, outputFilePath);
+        // await processImages(directoryPath, outputFilePath);
         getExcelSheet(outputFilePath);
     } catch (err) {
         console.error('Error:', err);
