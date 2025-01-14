@@ -21,6 +21,7 @@
     "form-data": "^4.0.0",
     "hh-mm-ss": "^1.2.0",
     "minimist": "^1.2.8",
+    "sharp": "^0.33.5",
     "yt-dlp-wrap": "^2.3.12"
   },
   "devDependencies": {

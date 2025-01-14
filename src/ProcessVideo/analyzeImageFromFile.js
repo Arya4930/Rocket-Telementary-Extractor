@@ -3,6 +3,7 @@ import CreateClient from '@azure-rest/ai-vision-image-analysis';
 const createClient = CreateClient.default;
 import { AzureKeyCredential } from '@azure/core-auth';
 import Vehicles from './vehicles.js';
+import { GetBoosterFuel, GetShipFuel } from '../fuelbar-percentage/index.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -86,7 +87,15 @@ export default async function analyzeImageFromFile(imagePath) {
             if (plustime) return plustime;
             if (!time) return;
 
-            return vehicleInstances.starship(words, time, imagePath);
+            const BoosterFuel = await GetBoosterFuel(imagePath);
+            const shipFuel = await GetShipFuel(imagePath);
+
+            return vehicleInstances.starship(
+                words,
+                time,
+                shipFuel,
+                BoosterFuel
+            );
         }
     } catch (error) {
         console.error('Error analyzing image:', error);

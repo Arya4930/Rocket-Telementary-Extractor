@@ -14,7 +14,7 @@ function isInt(value) {
 export default async function processImages(directoryPath, outputFilePath) {
     const files = fs
         .readdirSync(directoryPath)
-        .filter((file) => file.endsWith('.png'));
+        .filter((file) => /^frame_\d{4}\.png$/.test(file));
     const results = [];
 
     let skipcount = 0;
@@ -34,15 +34,16 @@ export default async function processImages(directoryPath, outputFilePath) {
         console.log(`Processing ${filePath}`);
         const data = await analyzeImageFromFile(filePath);
         if (
-            !data ||
-            (typeof data === 'object' && Object.keys(data).length === 0)
+            (!data ||
+                (typeof data === 'object' && Object.keys(data).length === 0)) &&
+            InCommingData == false
         ) {
             console.log(`No data found for ${filePath}. Skipping...`);
             fs.unlinkSync(filePath);
             continue;
         } else if (isInt(data) && InCommingData == false) {
             skipcount = data - 5;
-            console.log(`Skipping the next ${data} files...`);
+            console.log(`Skipping the next ${skipcount} files...`);
             fs.unlinkSync(filePath);
             continue;
         }

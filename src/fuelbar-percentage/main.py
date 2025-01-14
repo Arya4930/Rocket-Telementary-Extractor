@@ -3,34 +3,48 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sys
 
-image_path = sys.stdin.read()
+# Load the uploaded image
+image_path = sys.stdin.read().strip()
 image = cv2.imread(image_path)
+if image is None:
+    print("Error: Unable to load image. Check the file path.")
+    sys.exit(1)
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-_, thresh1 = cv2.threshold(gray, 40, 255, cv2.THRESH_BINARY)
-contours1, _ = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-progress_bars1 = []
-for contour in contours1:
+# Apply histogram equalization to improve the contrast
+equalized = cv2.equalizeHist(gray)
+
+# Apply Gaussian blur to reduce noise
+blurred = cv2.GaussianBlur(equalized, (17, 17), 0)
+
+# Apply Canny edge detection with adjusted parameters
+edges = cv2.Canny(blurred, 95, 150)
+
+# Perform morphological operations to close gaps in the edges
+kernel = np.ones((5, 5), np.uint8)
+closed_edges = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
+
+# Apply dilation to enhance the edges
+dilated = cv2.dilate(closed_edges, kernel, iterations=2)
+
+# Apply erosion to remove small noise
+eroded = cv2.erode(dilated, kernel, iterations=1)
+
+# Find contours from eroded edges
+contours, _ = cv2.findContours(eroded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+# Filter contours by aspect ratio and size (to detect horizontal bars)
+progress_bars = []
+for contour in contours:
     x, y, w, h = cv2.boundingRect(contour)
     aspect_ratio = w / h
-    if 5 < aspect_ratio < 50 and h > 5:
-        progress_bars1.append((x, y, w, h))
+    if 5 < aspect_ratio < 50 and h > 5:  # Aspect ratio and height threshold for progress bars
+        progress_bars.append((x, y, w, h))
+# Calculate widths of the progress bars
+output = [w for x, y, w, h in progress_bars]
 
-_, thresh2 = cv2.threshold(gray, 65, 255, cv2.THRESH_BINARY)
-contours2, _ = cv2.findContours(thresh2, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+# Calculate percentages
+percentage_1 = (output[0]*100)/243 if len(output) > 0 else 0
+percentage_2 = (output[1]*100)/243 if len(output) > 1 else 0
 
-progress_bars2 = []
-for contour in contours2:
-    x, y, w, h = cv2.boundingRect(contour)
-    aspect_ratio = w / h
-    if 5 < aspect_ratio < 50 and h > 5:
-        progress_bars2.append((x, y, w, h))
-
-output = []
-for x, y, w, h in progress_bars1:
-    output.append(x-y)
-for x, y, w, h in progress_bars2:
-    output.append(x-y)
-
-print((output[0]*100)/output[1])
-print((output[2]*100)/output[3])
+print(percentage_1, percentage_2)
