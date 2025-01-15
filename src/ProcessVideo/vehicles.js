@@ -6,8 +6,8 @@ class Vehicles {
         this.ship_altitude = 0;
         this.boosterloxPercent = 100.0;
         this.boosterch4Percent = 100.0;
-        this.shiploxPercent = 100.0;
-        this.shipch4Percent = 100.0;
+        this.shiploxPercent = 97.0;
+        this.shipch4Percent = 94.0;
     }
 
     starship(words, time, shipFuel, BoosterFuel) {
@@ -28,22 +28,21 @@ class Vehicles {
                 break;
             }
         }
+        const boosterfuel = BoosterFuel.split('\r\n');
+        this.boosterloxPercent = parseFloat(
+            parseFloat(boosterfuel[0]).toFixed(2)
+        );
+        this.boosterch4Percent = parseFloat(
+            parseFloat(boosterfuel[1]).toFixed(2)
+        );
 
         if (totalSeconds < 150) {
-            const boosterfuel = BoosterFuel.split('\r\n');
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
-            this.boosterloxPercent = parseFloat(
-                parseFloat(boosterfuel[0]).toFixed(2)
-            );
-            this.boosterch4Percent = parseFloat(
-                parseFloat(boosterfuel[1]).toFixed(2)
-            );
-            this.shiploxPercent = 100.0;
-            this.shipch4Percent = 100.0;
+            this.shiploxPercent = 97.0;
+            this.shipch4Percent = 94.0;
         } else {
             const ShipFuel = shipFuel.split('\r\n');
-            console.log(shipFuel);
             this.shiploxPercent = parseFloat(
                 parseFloat(ShipFuel[0]).toFixed(2)
             );

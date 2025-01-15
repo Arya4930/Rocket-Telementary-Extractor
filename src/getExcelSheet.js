@@ -217,10 +217,6 @@ export default function getExcelSheet(sheet) {
             ship_speed = await jsonData[rowIndex].ship_speed;
             booster_altitude = await jsonData[rowIndex].booster_altitude;
             ship_altitude = await jsonData[rowIndex].ship_altitude;
-            Booster_CH4_Percent = await jsonData[rowIndex].booster_CH4_Percent;
-            Booster_LOX_Percent = await jsonData[rowIndex].booster_LOX_Percent;
-            Ship_CH4_Percent = await jsonData[rowIndex].ship_CH4_Percent;
-            Ship_LOX_Percent = await jsonData[rowIndex].ship_LOX_Percent;
 
             booster_speedinms = Math.round((booster_speed / 3.6) * 100) / 100;
             ship_speedinms = Math.round((ship_speed / 3.6) * 100) / 100;
@@ -253,14 +249,14 @@ export default function getExcelSheet(sheet) {
                 : booster_altitude
         );
         ws.cell(rowIndex + 2, 6).number(
-            Booster_LOX_Percent === null || isNaN(Booster_LOX_Percent)
+            item.booster_LOX_Percent === null || isNaN(item.booster_LOX_Percent)
                 ? 0
-                : Booster_LOX_Percent
+                : item.booster_LOX_Percent
         );
         ws.cell(rowIndex + 2, 7).number(
-            Booster_CH4_Percent === null || isNaN(Booster_CH4_Percent)
+            item.booster_CH4_Percent === null || isNaN(item.booster_CH4_Percent)
                 ? 0
-                : Booster_CH4_Percent
+                : item.booster_CH4_Percent
         );
         ws.cell(rowIndex + 2, 8).number(
             ship_speed === null || isNaN(ship_speed) ? 0 : ship_speed
@@ -279,14 +275,14 @@ export default function getExcelSheet(sheet) {
             ship_altitude === null || isNaN(ship_altitude) ? 0 : ship_altitude
         );
         ws.cell(rowIndex + 2, 12).number(
-            Ship_LOX_Percent === null || isNaN(Ship_LOX_Percent)
+            item.ship_LOX_Percent === null || isNaN(item.ship_LOX_Percent)
                 ? 0
-                : Ship_LOX_Percent
+                : item.ship_LOX_Percent
         );
         ws.cell(rowIndex + 2, 13).number(
-            Ship_CH4_Percent === null || isNaN(Ship_CH4_Percent)
+            item.ship_CH4_Percent === null || isNaN(item.ship_CH4_Percent)
                 ? 0
-                : Ship_CH4_Percent
+                : item.ship_CH4_Percent
         );
     });
 

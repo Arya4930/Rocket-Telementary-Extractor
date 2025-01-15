@@ -6,7 +6,7 @@ def is_color_match(pixel, target, tolerance):
     return np.all(np.abs(pixel - target) <= tolerance)
 
 def verify_next_pixels(image, x, y, target_color, tolerance):
-    for i in range(1, 3):
+    for i in range(1, 6):
         if x + i < image.shape[1]: 
             if not is_color_match(image[y, x + i], target_color, tolerance):
                 return False
@@ -26,10 +26,9 @@ for image_path in file_paths:
     if image is None:
         print("Error: Unable to load image. Check the file path.")
         sys.exit(1)
-
+    
     target_color = np.array([40, 40, 40])
-    tolerance = 15
-
+    tolerance = 20
     first_target_point = None
     for x in range(len(image[5])):
         pixel = image[6, x]
@@ -39,6 +38,6 @@ for image_path in file_paths:
                 break
 
     if first_target_point:
-        print((x-1)*100/238)
+        print((first_target_point[0]-2)*100/238)
     else:
-        print(0)
+        print("No matching point found.")
