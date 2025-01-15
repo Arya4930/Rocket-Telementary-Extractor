@@ -11,9 +11,6 @@ class Vehicles {
     }
 
     starship(words, time, shipFuel, BoosterFuel) {
-        const boosterfuel = BoosterFuel.split('\r\n');
-        console.log(boosterfuel);
-
         if (words[0].text !== 'SPEED') {
             words.shift();
         }
@@ -33,6 +30,7 @@ class Vehicles {
         }
 
         if (totalSeconds < 150) {
+            const boosterfuel = BoosterFuel.split('\r\n');
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
             this.boosterloxPercent = parseFloat(
@@ -70,7 +68,7 @@ class Vehicles {
             ship_altitude: parseInt(this.ship_altitude) || 0,
             ship_LOX_Percent: this.shiploxPercent,
             ship_CH4_Percent: this.shipch4Percent,
-            ...(totalSeconds <= 480 && {
+            ...(totalSeconds <= 420 && {
                 booster_speed: parseInt(this.booster_speed) || 0,
                 booster_altitude: parseInt(this.booster_altitude) || 0,
                 booster_LOX_Percent: this.boosterloxPercent,

@@ -80,6 +80,41 @@ const VerifyAltitude = (jsonData, rowIndex, type) => {
     }
     return verifiedAltitude;
 };
+const VerifyFuel = (jsonData, rowIndex, type) => {
+    const fuel_type =
+        {
+            B_lox: 'booster_LOX_Percent',
+            B_CH4: 'booster_CH4_Percent',
+            S_LOX: 'ship_LOX_Percent',
+            S_CH4: 'ship_CH4_Percent'
+        }[type] || 'ship_CH4_Percent';
+
+    let verifyFuel = jsonData[rowIndex][fuel_type];
+    let offset = 1;
+
+    while (
+        (Math.abs(jsonData[rowIndex - offset]?.[fuel_type] - verifyFuel) > 5 ||
+            Math.abs(jsonData[rowIndex + offset]?.[fuel_type] - verifyFuel) >
+                5 ||
+            verifyFuel === 0) &&
+        rowIndex - offset >= 0 &&
+        rowIndex + offset < jsonData.length
+    ) {
+        const previousFuelPercentage = jsonData[rowIndex - offset]?.[fuel_type];
+        const nextFuelPercentage = jsonData[rowIndex + offset]?.[fuel_type];
+
+        if (
+            previousFuelPercentage !== undefined &&
+            nextFuelPercentage !== undefined
+        ) {
+            verifyFuel = Math.round(
+                (previousFuelPercentage + nextFuelPercentage) / 2
+            );
+        }
+        offset++;
+    }
+    return verifyFuel;
+};
 
 export default function getExcelSheet(sheet) {
     const jsonData = JSON.parse(fs.readFileSync(sheet, 'utf8'));
@@ -124,6 +159,11 @@ export default function getExcelSheet(sheet) {
         let ship_acceleration = 0;
         let ship_altitude = parseFloat(item.ship_altitude);
 
+        let Booster_LOX_Percent = parseFloat(item.booster_LOX_Percent);
+        let Booster_CH4_Percent = parseFloat(item.booster_CH4_Percent);
+        let Ship_LOX_Percent = parseFloat(item.ship_LOX_Percent);
+        let Ship_CH4_Percent = parseFloat(item.ship_CH4_Percent);
+
         let booster_speedinms = Math.round((booster_speed / 3.6) * 100) / 100;
         let ship_speedinms = Math.round((ship_speed / 3.6) * 100) / 100;
 
@@ -152,11 +192,35 @@ export default function getExcelSheet(sheet) {
                 rowIndex,
                 'Ship'
             );
+            jsonData[rowIndex].booster_LOX_Percent = await VerifyFuel(
+                jsonData,
+                rowIndex,
+                'B_lox'
+            );
+            jsonData[rowIndex].booster_CH4_Percent = await VerifyFuel(
+                jsonData,
+                rowIndex,
+                'B_CH4'
+            );
+            jsonData[rowIndex].ship_LOX_Percent = await VerifyFuel(
+                jsonData,
+                rowIndex,
+                'S_LOX'
+            );
+            jsonData[rowIndex].ship_CH4_Percent = await VerifyFuel(
+                jsonData,
+                rowIndex,
+                'S_CH4'
+            );
 
             booster_speed = await jsonData[rowIndex].booster_speed;
             ship_speed = await jsonData[rowIndex].ship_speed;
             booster_altitude = await jsonData[rowIndex].booster_altitude;
             ship_altitude = await jsonData[rowIndex].ship_altitude;
+            Booster_CH4_Percent = await jsonData[rowIndex].booster_CH4_Percent;
+            Booster_LOX_Percent = await jsonData[rowIndex].booster_LOX_Percent;
+            Ship_CH4_Percent = await jsonData[rowIndex].ship_CH4_Percent;
+            Ship_LOX_Percent = await jsonData[rowIndex].ship_LOX_Percent;
 
             booster_speedinms = Math.round((booster_speed / 3.6) * 100) / 100;
             ship_speedinms = Math.round((ship_speed / 3.6) * 100) / 100;
@@ -189,14 +253,14 @@ export default function getExcelSheet(sheet) {
                 : booster_altitude
         );
         ws.cell(rowIndex + 2, 6).number(
-            item.booster_LOX_Percent === null || isNaN(item.booster_LOX_Percent)
+            Booster_LOX_Percent === null || isNaN(Booster_LOX_Percent)
                 ? 0
-                : item.booster_LOX_Percent
+                : Booster_LOX_Percent
         );
         ws.cell(rowIndex + 2, 7).number(
-            item.booster_CH4_Percent === null || isNaN(item.booster_CH4_Percent)
+            Booster_CH4_Percent === null || isNaN(Booster_CH4_Percent)
                 ? 0
-                : item.booster_CH4_Percent
+                : Booster_CH4_Percent
         );
         ws.cell(rowIndex + 2, 8).number(
             ship_speed === null || isNaN(ship_speed) ? 0 : ship_speed
@@ -215,14 +279,14 @@ export default function getExcelSheet(sheet) {
             ship_altitude === null || isNaN(ship_altitude) ? 0 : ship_altitude
         );
         ws.cell(rowIndex + 2, 12).number(
-            item.ship_LOX_Percent === null || isNaN(item.ship_LOX_Percent)
+            Ship_LOX_Percent === null || isNaN(Ship_LOX_Percent)
                 ? 0
-                : item.ship_LOX_Percent
+                : Ship_LOX_Percent
         );
         ws.cell(rowIndex + 2, 13).number(
-            item.ship_CH4_Percent === null || isNaN(item.ship_CH4_Percent)
+            Ship_CH4_Percent === null || isNaN(Ship_CH4_Percent)
                 ? 0
-                : item.ship_CH4_Percent
+                : Ship_CH4_Percent
         );
     });
 
