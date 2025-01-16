@@ -11,7 +11,11 @@ function isInt(value) {
     );
 }
 
-export default async function processImages(directoryPath, outputFilePath) {
+export default async function processImages(
+    directoryPath,
+    outputFilePath,
+    rocketType
+) {
     const files = fs
         .readdirSync(directoryPath)
         .filter((file) => /^frame_\d{4}\.png$/.test(file));
@@ -32,7 +36,7 @@ export default async function processImages(directoryPath, outputFilePath) {
             continue;
         }
         console.log(`Processing ${filePath}`);
-        const data = await analyzeImageFromFile(filePath);
+        const data = await analyzeImageFromFile(filePath, rocketType);
         if (
             (!data ||
                 (typeof data === 'object' && Object.keys(data).length === 0)) &&

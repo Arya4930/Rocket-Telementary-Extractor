@@ -11,7 +11,7 @@ const vehicleInstances = new Vehicles();
 
 const features = ['Read'];
 
-export default async function analyzeImageFromFile(imagePath) {
+export default async function analyzeImageFromFile(imagePath, rocketType) {
     try {
         const imageData = fs.readFileSync(imagePath);
 
@@ -38,17 +38,11 @@ export default async function analyzeImageFromFile(imagePath) {
                     }))
                 )
             );
-            let a = [];
-            words
-                .filter((word) => {
-                    return (
-                        word.boundingPolygon[2].x < 400 &&
-                        word.boundingPolygon[2].y < 1100
-                    );
-                })
-                .map((word) => {
-                    a.push(word.text);
-                });
+            // for (let i = 0; i < words.length; i++) {
+            //     console.log(words[i].text);
+            //     console.log(words[i].boundingPolygon);
+            // }
+
             // const filteredWords = a.filter(word => {
             //     // Check if word is a valid number (integer or float)
             //     const isNumber = /^\d+(\.\d+)?$/.test(word);
@@ -72,30 +66,59 @@ export default async function analyzeImageFromFile(imagePath) {
 
             let plustime;
 
-            await words.forEach((word) => {
-                if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
-                    time = word.text.substring(2);
-                }
-                if (/^T\-\d{2}:\d{2}:\d{2}$/.test(word.text)) {
+            for (const word of words) {
+                if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
                     const t = word.text
                         .substring(2)
                         .split(':')
                         .map((e) => Number(e));
                     plustime = t[0] * 3600 + t[1] * 60 + t[2];
+                } else {
+                    if (
+                        word.boundingPolygon[0]['x'] > 800 &&
+                        word.boundingPolygon[0]['y'] > 960 &&
+                        word.boundingPolygon[1]['x'] < 1120 &&
+                        word.boundingPolygon[1]['y'] < 1000
+                    ) {
+                        if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
+                            time = word.text.substring(2);
+                        }
+                        if (/^\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
+                            time = word.text;
+                        }
+                        if (/^:\d{1,2}:\d{2}$/.test(word.text)) {
+                            time = '00' + word.text;
+                        }
+                        if (/^\d{1,2}:\d{2}$/.test(word.text)) {
+                            time = '00:' + word.text;
+                        }
+                        if (/^\d{3}:\d{2}$/.test(word.text)) {
+                            time = '00:' + word.text.substring(1);
+                        }
+                        if (/^\+\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
+                            time = word.text.substring(1);
+                        }
+                        if (/^[A-Z][A-Z]:\d{2}:\d{2}$/.test(word.text)) {
+                            time = '00' + word.text.substring(2);
+                        }
+                    }
                 }
-            });
+            }
             if (plustime) return plustime;
             if (!time) return;
 
-            const BoosterFuel = await GetBoosterFuel(imagePath);
-            const shipFuel = await GetShipFuel(imagePath);
-
-            return vehicleInstances.starship(
-                words,
-                time,
-                shipFuel,
-                BoosterFuel
-            );
+            if (rocketType === 'Starship') {
+                const BoosterFuel = await GetBoosterFuel(imagePath);
+                const shipFuel = await GetShipFuel(imagePath);
+                return vehicleInstances.starship(
+                    words,
+                    time,
+                    shipFuel,
+                    BoosterFuel
+                );
+            } else if (rocketType === 'new_glenn') {
+                return vehicleInstances.new_glenn(words, time);
+            }
         }
     } catch (error) {
         console.error('Error analyzing image:', error);
