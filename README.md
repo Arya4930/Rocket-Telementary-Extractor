@@ -6,7 +6,7 @@
 	<br />
 </div>
 
-### Currently works only for Starship. Support for Falcon-9 and other rockets in progress
+### Currently works only for Starship and New Glenn. Support for Falcon-9 and other rockets in progress
 
 This project leverages the Azure Vision API to extract telemetry data shown on the screen from frames, achieving a high accuracy of upto ~99.6%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour Video).
 
@@ -32,15 +32,20 @@ npm install
 ```
 
 2. ### Run the script:
-There are 2 ways you can run the script. Either you can get the link of the video and run
+There are 3 ways you can run the script. Either you can get the link of the video and run ( This only works for Starship launches )
 
 ```bash
 node src/index.js -v "<your-video-link-here>"
 ```
+or you can put the name of the rocket and run 
+```bash
+node src/index.js -v "<your-video-link-here>" -r "<name-of-the-rocket>"
+```
 or you can download the video yourself and shorten it down to be just the launch footage, place it in `video-dataset` folder and simply run the command
 ```bash
-npm start
+npm src/index.js -r "<name-of-the-rocket>"
 ```
+Supported rockets -> `Starship` and `new_glenn`, write these exact names in the `<name-of-the-rocket>` section
 
 ## Notes
 > The script processes every frame of the video, which can take a considerable amount of time.
