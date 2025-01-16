@@ -145,7 +145,12 @@ class Vehicles {
             }
         }
 
-        if (totalSeconds > 218) {
+        if (totalSeconds > 407) {
+            this.booster_altitude =
+                Math.round(this.booster_altitude * 0.0003048 * 100) / 100;
+            this.ship_altitude =
+                Math.round(this.ship_altitude * 1.60934 * 100) / 100;
+        } else if (totalSeconds > 218) {
             this.booster_altitude =
                 Math.round(this.booster_altitude * 1.60934 * 100) / 100;
             this.ship_altitude =
@@ -160,7 +165,7 @@ class Vehicles {
             time: time || 'Not found',
             ship_speed: parseFloat(this.ship_speed) || 0,
             ship_altitude: parseFloat(this.ship_altitude) || 0,
-            ...(totalSeconds <= 420 && {
+            ...(totalSeconds <= 480 && {
                 booster_speed: parseFloat(this.booster_speed) || 0,
                 booster_altitude: parseFloat(this.booster_altitude) || 0
             })
