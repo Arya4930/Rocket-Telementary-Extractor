@@ -38,31 +38,31 @@ export default async function analyzeImageFromFile(imagePath, rocketType) {
                     }))
                 )
             );
-            // for (let i = 0; i < words.length; i++) {
-            //     console.log(words[i].text);
-            //     console.log(words[i].boundingPolygon);
-            // }
-
-            // const filteredWords = a.filter(word => {
-            //     // Check if word is a valid number (integer or float)
-            //     const isNumber = /^\d+(\.\d+)?$/.test(word);
-
-            //     // Check if word matches the time pattern 'T+00:XX:XX'
-            //     const isTime = /^00:\d{2}:\d{2}$/.test(word);
-            //     const isKeyword = /^(KM\/H|KM)$/.test(word); // Matches 'KM/H' or 'KM'
-
-            //     return isNumber || isTime ||  isKeyword;
-            // });
-
-            // words.forEach((word, index) => {
-            //     if (word.startsWith('T-') || word.startsWith('T+')) {
-            //         time = word.split`+`[1];
-            //     } else if (word.includes('KM/H')) {
-            //         speed = words[index - 1];
-            //     } else if (word.includes('ALTITUDE')) {
-            //         altitude = words[index + 1];
-            //     }
-            // });
+            const patterns = [
+                {
+                    regex: /^T\+\d{2}:\d{2}:\d{2}$/,
+                    transform: (text) => text.substring(2)
+                },
+                {
+                    regex: /^T\+\d{2}[:.]\d{2}[:.]\d{2}$/,
+                    transform: (text) => text.substring(2).replace('.', ':')
+                },
+                { regex: /^\d{1,2}:\d{2}:\d{2}$/, transform: (text) => text },
+                { regex: /^:\d{1,2}:\d{2}$/, transform: (text) => `00${text}` },
+                { regex: /^\d{1,2}:\d{2}$/, transform: (text) => `00:${text}` },
+                {
+                    regex: /^\d{3}:\d{2}$/,
+                    transform: (text) => `00:${text.substring(1)}`
+                },
+                {
+                    regex: /^\+\d{1,2}:\d{2}:\d{2}$/,
+                    transform: (text) => text.substring(1)
+                },
+                {
+                    regex: /^[A-Z]{2}:\d{2}:\d{2}$/,
+                    transform: (text) => `00${text.substring(2)}`
+                }
+            ];
 
             let plustime;
 
@@ -74,22 +74,10 @@ export default async function analyzeImageFromFile(imagePath, rocketType) {
                         .map((e) => Number(e));
                     plustime = t[0] * 3600 + t[1] * 60 + t[2];
                 } else {
-                    if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
-                        time = word.text.substring(2);
-                    } else if (/^T\+\d{2}[:.]\d{2}[:.]\d{2}$/.test(word.text)) {
-                        time = word.text.substring(2).replace('.', ':');
-                    } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                        time = word.text;
-                    } else if (/^:\d{1,2}:\d{2}$/.test(word.text)) {
-                        time = '00' + word.text;
-                    } else if (/^\d{1,2}:\d{2}$/.test(word.text)) {
-                        time = '00:' + word.text;
-                    } else if (/^\d{3}:\d{2}$/.test(word.text)) {
-                        time = '00:' + word.text.substring(1);
-                    } else if (/^\+\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                        time = word.text.substring(1);
-                    } else if (/^[A-Z][A-Z]:\d{2}:\d{2}$/.test(word.text)) {
-                        time = '00' + word.text.substring(2);
+                    for (const { regex, transform } of patterns) {
+                        if (regex.test(word.text)) {
+                            return transform(word.text);
+                        }
                     }
                 }
             }
