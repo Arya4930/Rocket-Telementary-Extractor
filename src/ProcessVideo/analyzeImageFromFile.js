@@ -74,33 +74,22 @@ export default async function analyzeImageFromFile(imagePath, rocketType) {
                         .map((e) => Number(e));
                     plustime = t[0] * 3600 + t[1] * 60 + t[2];
                 } else {
-                    if (
-                        word.boundingPolygon[0]['x'] > 800 &&
-                        word.boundingPolygon[0]['y'] > 960 &&
-                        word.boundingPolygon[1]['x'] < 1120 &&
-                        word.boundingPolygon[1]['y'] < 1000
-                    ) {
-                        if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
-                            time = word.text.substring(2);
-                        }
-                        if (/^\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                            time = word.text;
-                        }
-                        if (/^:\d{1,2}:\d{2}$/.test(word.text)) {
-                            time = '00' + word.text;
-                        }
-                        if (/^\d{1,2}:\d{2}$/.test(word.text)) {
-                            time = '00:' + word.text;
-                        }
-                        if (/^\d{3}:\d{2}$/.test(word.text)) {
-                            time = '00:' + word.text.substring(1);
-                        }
-                        if (/^\+\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                            time = word.text.substring(1);
-                        }
-                        if (/^[A-Z][A-Z]:\d{2}:\d{2}$/.test(word.text)) {
-                            time = '00' + word.text.substring(2);
-                        }
+                    if (/^T\+\d{2}:\d{2}:\d{2}$/.test(word.text)) {
+                        time = word.text.substring(2);
+                    } else if (/^T\+\d{2}[:.]\d{2}[:.]\d{2}$/.test(word.text)) {
+                        time = word.text.substring(2).replace('.', ':');
+                    } else if (/^\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
+                        time = word.text;
+                    } else if (/^:\d{1,2}:\d{2}$/.test(word.text)) {
+                        time = '00' + word.text;
+                    } else if (/^\d{1,2}:\d{2}$/.test(word.text)) {
+                        time = '00:' + word.text;
+                    } else if (/^\d{3}:\d{2}$/.test(word.text)) {
+                        time = '00:' + word.text.substring(1);
+                    } else if (/^\+\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
+                        time = word.text.substring(1);
+                    } else if (/^[A-Z][A-Z]:\d{2}:\d{2}$/.test(word.text)) {
+                        time = '00' + word.text.substring(2);
                     }
                 }
             }

@@ -30,10 +30,10 @@ class Vehicles {
         }
         const boosterfuel = BoosterFuel.split('\r\n');
         this.boosterloxPercent = parseFloat(
-            parseFloat(boosterfuel[0]).toFixed(2)
+            parseFloat(boosterfuel[0]).toFixed(2) + 0.42
         );
         this.boosterch4Percent = parseFloat(
-            parseFloat(boosterfuel[1]).toFixed(2)
+            parseFloat(boosterfuel[1]).toFixed(2) + 0.42
         );
 
         if (totalSeconds < 150) {
@@ -44,10 +44,10 @@ class Vehicles {
         } else {
             const ShipFuel = shipFuel.split('\r\n');
             this.shiploxPercent = parseFloat(
-                parseFloat(ShipFuel[0]).toFixed(2)
+                parseFloat(ShipFuel[0]).toFixed(2) - 0.42
             );
             this.shipch4Percent = parseFloat(
-                parseFloat(ShipFuel[1]).toFixed(2)
+                parseFloat(ShipFuel[1]).toFixed(2) - 0.42
             );
             for (let i = 0; i < words.length; i++) {
                 if (words[i].text === 'ALTITUDE' && words[i + 1]) {
