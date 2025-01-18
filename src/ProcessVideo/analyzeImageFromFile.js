@@ -3,7 +3,10 @@ import CreateClient from '@azure-rest/ai-vision-image-analysis';
 const createClient = CreateClient.default;
 import { AzureKeyCredential } from '@azure/core-auth';
 import Vehicles from './vehicles.js';
-import { GetBoosterFuel, GetShipFuel } from '../fuelbar-percentage/index.js';
+import {
+    GetBoosterFuel,
+    GetShipFuel
+} from '../fuelbar-percentage/scriptrunner.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);

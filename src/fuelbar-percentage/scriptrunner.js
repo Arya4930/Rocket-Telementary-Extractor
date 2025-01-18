@@ -21,7 +21,7 @@ export async function GetBoosterFuel(img) {
     return new Promise((resolve, reject) => {
         try {
             const pythonProcess = spawn('python', [
-                './src/fuelbar-percentage/main.py'
+                './src/fuelbar-percentage/getFuel.py'
             ]);
 
             pythonProcess.stdin.write(
@@ -77,7 +77,7 @@ export async function GetShipFuel(img) {
     return new Promise((resolve, reject) => {
         try {
             const pythonProcess = spawn('python', [
-                './src/fuelbar-percentage/main.py'
+                './src/fuelbar-percentage/getFuel.py'
             ]);
 
             pythonProcess.stdin.write(
