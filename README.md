@@ -12,7 +12,7 @@ This project leverages the Azure Vision API to extract telemetry data shown on t
 
 ## Requirements
 
-Before running the script, you need an Azure Vision API key. After getting your key follow these steps:
+Before running the script, you need an Azure Vision API key. ( you can get one [here](https://portal.vision.cognitive.azure.com/demo/extract-text-from-images) ) After getting your key follow these steps:
 
 1. **Create an .env file** in the root directory of the project.
 2. Add the following lines to the .env file, replacing <your-vision-key> with your actual Azure Vision API key:
@@ -48,6 +48,8 @@ npm src/index.js -r "<name-of-the-rocket>"
 Supported rockets -> `Starship` and `new_glenn`, write these exact names in the `<name-of-the-rocket>` section
 
 ## Notes
+You can also start your Microsoft Azure AI journey with [this](https://learn.microsoft.com/en-us/plans/8pkkiy5x76oy7y?tab=tab-created&source=docs&learnerGroupId=440f340c-27d3-4554-9fb2-88fe82a9a692&wt.mc_id=studentamb_447844) Link. ( Yes it is my referral link, would be appreciated if you did it from there )
+
 > The script processes every frame of the video, which can take a considerable amount of time.
 
 > Make sure your Azure Vision API key has the necessary permissions and quotas for the volume of requests you’re making.
