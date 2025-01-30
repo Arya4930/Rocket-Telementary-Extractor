@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
-import { isInt } from '../Functions.js';
+import { isInt } from '../utils/Functions.js';
 
 export default async function processImages(
     directoryPath,
