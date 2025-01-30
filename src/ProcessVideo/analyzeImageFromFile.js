@@ -7,6 +7,7 @@ import {
     GetBoosterFuel,
     GetShipFuel
 } from '../fuelbar-percentage/scriptrunner.js';
+import { IncremenetTimeBy1second } from '../Functions.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -14,7 +15,11 @@ const vehicleInstances = new Vehicles();
 
 const features = ['Read'];
 
-export default async function analyzeImageFromFile(imagePath, rocketType) {
+export default async function analyzeImageFromFile(
+    imagePath,
+    rocketType,
+    Temptime
+) {
     try {
         const imageData = fs.readFileSync(imagePath);
 
@@ -41,51 +46,65 @@ export default async function analyzeImageFromFile(imagePath, rocketType) {
                     }))
                 )
             );
-            const patterns = [
-                {
-                    regex: /^T\+\d{2}:\d{2}:\d{2}$/,
-                    transform: (text) => text.substring(2)
-                },
-                {
-                    regex: /^T\+\d{2}[:.]\d{2}[:.]\d{2}$/,
-                    transform: (text) => text.substring(2).replace('.', ':')
-                },
-                { regex: /^\d{1,2}:\d{2}:\d{2}$/, transform: (text) => text },
-                { regex: /^:\d{1,2}:\d{2}$/, transform: (text) => `00${text}` },
-                { regex: /^\d{1,2}:\d{2}$/, transform: (text) => `00:${text}` },
-                {
-                    regex: /^\d{3}:\d{2}$/,
-                    transform: (text) => `00:${text.substring(1)}`
-                },
-                {
-                    regex: /^\+\d{1,2}:\d{2}:\d{2}$/,
-                    transform: (text) => text.substring(1)
-                },
-                {
-                    regex: /^[A-Z]{2}:\d{2}:\d{2}$/,
-                    transform: (text) => `00${text.substring(2)}`
-                }
-            ];
 
-            let plustime;
+            if (!Temptime) {
+                const patterns = [
+                    {
+                        regex: /^T\+\d{2}:\d{2}:\d{2}$/,
+                        transform: (text) => text.substring(2)
+                    },
+                    {
+                        regex: /^T\+\d{2}[:.]\d{2}[:.]\d{2}$/,
+                        transform: (text) => text.substring(2).replace('.', ':')
+                    },
+                    {
+                        regex: /^\d{1,2}:\d{2}:\d{2}$/,
+                        transform: (text) => text
+                    },
+                    {
+                        regex: /^:\d{1,2}:\d{2}$/,
+                        transform: (text) => `00${text}`
+                    },
+                    {
+                        regex: /^\d{1,2}:\d{2}$/,
+                        transform: (text) => `00:${text}`
+                    },
+                    {
+                        regex: /^\d{3}:\d{2}$/,
+                        transform: (text) => `00:${text.substring(1)}`
+                    },
+                    {
+                        regex: /^\+\d{1,2}:\d{2}:\d{2}$/,
+                        transform: (text) => text.substring(1)
+                    },
+                    {
+                        regex: /^[A-Z]{2}:\d{2}:\d{2}$/,
+                        transform: (text) => `00${text.substring(2)}`
+                    }
+                ];
 
-            for (const word of words) {
-                if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                    const t = word.text
-                        .substring(2)
-                        .split(':')
-                        .map((e) => Number(e));
-                    plustime = t[0] * 3600 + t[1] * 60 + t[2];
-                } else {
-                    for (const { regex, transform } of patterns) {
-                        if (regex.test(word.text)) {
-                            time = transform(word.text);
+                let plustime;
+
+                for (const word of words) {
+                    if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
+                        const t = word.text
+                            .substring(2)
+                            .split(':')
+                            .map((e) => Number(e));
+                        plustime = t[0] * 3600 + t[1] * 60 + t[2];
+                    } else {
+                        for (const { regex, transform } of patterns) {
+                            if (regex.test(word.text)) {
+                                time = transform(word.text);
+                            }
                         }
                     }
                 }
+                if (plustime) return plustime;
+                if (!time) return;
+            } else {
+                time = IncremenetTimeBy1second(Temptime);
             }
-            if (plustime) return plustime;
-            if (!time) return;
 
             if (rocketType === 'Starship') {
                 const BoosterFuel = await GetBoosterFuel(imagePath);

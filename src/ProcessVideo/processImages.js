@@ -1,15 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
-
-function isInt(value) {
-    return (
-        !isNaN(value) &&
-        (function (x) {
-            return (x | 0) === x;
-        })(parseFloat(value))
-    );
-}
+import { isInt } from '../Functions.js';
 
 export default async function processImages(
     directoryPath,
@@ -23,6 +15,7 @@ export default async function processImages(
 
     let skipcount = 0;
     let InCommingData = false;
+    let time = null;
 
     for (const file of files) {
         const filePath = path.join(directoryPath, file);
@@ -36,7 +29,7 @@ export default async function processImages(
             continue;
         }
         console.log(`Processing ${filePath}`);
-        const data = await analyzeImageFromFile(filePath, rocketType);
+        const data = await analyzeImageFromFile(filePath, rocketType, time);
         if (
             (!data ||
                 (typeof data === 'object' && Object.keys(data).length === 0)) &&
@@ -51,6 +44,7 @@ export default async function processImages(
             fs.unlinkSync(filePath);
             continue;
         }
+        time = data.time;
         results.push({ file: file, ...data });
         InCommingData = true;
     }
