@@ -79,7 +79,7 @@ export default async function analyzeImageFromFile(imagePath, rocketType) {
                 } else {
                     for (const { regex, transform } of patterns) {
                         if (regex.test(word.text)) {
-                            return transform(word.text);
+                            time = transform(word.text);
                         }
                     }
                 }
