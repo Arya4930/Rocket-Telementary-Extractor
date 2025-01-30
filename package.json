@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/index.js",
-    "analyze": "node src/AnalyzeData/scriptrunner.js"
+    "analyze": "node src/analyze/scriptrunner.js"
   },
   "type": "module",
   "author": "",

@@ -1,13 +1,14 @@
 import { spawn } from 'child_process';
-import sharp from 'sharp';
-import fs from 'fs';
+
 const __dirname = import.meta.dirname;
 
-InputPath = `${__dirname}../../results.json`;
-OutputPath = `${__dirname}../../results-filtered.json`;
+const InputPath = `${__dirname}../../results.json`;
+const OutputPath = `${__dirname}../../results-filtered.json`;
 
 async function AnalyzeData(InputPath) {
-    // code here
+    const pythonProcess = spawn('python', ['./src/analyze/analyze.py']);
+    pythonProcess.stdin.write(InputPath);
+    pythonProcess.stdin.end();
 }
 
 AnalyzeData(InputPath);
