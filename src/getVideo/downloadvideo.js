@@ -30,7 +30,7 @@ export default async function DownloadVideo(videoURL, outputPath) {
 
         return new Promise((resolve, reject) => {
             let ytDlpEventEmitter = ytDlpWrap
-                .exec([videoURL, '-o', outputPath])
+                .exec([videoURL, '-o', outputPath, '--no-audio'])
                 .on('ytDlpEvent', (eventType, eventData) =>
                     console.log(eventType, eventData)
                 )

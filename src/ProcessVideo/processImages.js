@@ -16,6 +16,7 @@ export default async function processImages(
     let skipcount = 0;
     let InCommingData = false;
     let time = null;
+    let timeCtr = 0;
 
     for (const file of files) {
         const filePath = path.join(directoryPath, file);
@@ -44,9 +45,21 @@ export default async function processImages(
             fs.unlinkSync(filePath);
             continue;
         }
+        const values = Object.values(data).filter((val) => val !== 'Not found');
         time = data.time;
+        if (values.every((val) => val === 0)) {
+            // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
+            timeCtr++;
+            if (timeCtr > 20) {
+                console.log(`skipping Next 10 files as all values are 0`);
+                skipcount = 10;
+                continue;
+            }
+        }
         results.push({ file: file, ...data });
         InCommingData = true;
+        // resetting the time counter
+        timeCtr = 0;
     }
 
     fs.writeFileSync(outputFilePath, JSON.stringify(results, null, 2));
