@@ -84,8 +84,6 @@ class Vehicles {
     }
 
     new_glenn(words, time) {
-        console.log(words[7].text);
-        console.log(words[7].boundingPolygon[0]['x']);
         const timeParts = time.split(':');
         const hours = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);

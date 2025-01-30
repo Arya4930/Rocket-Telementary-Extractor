@@ -13,7 +13,7 @@ async function ensureYTDlpBinary() {
             await YTDlpWrap.downloadFromGithub(ytDlpBinaryPath);
             console.log('yt-dlp binary downloaded successfully.');
         } catch (error) {
-            console.error('Failed to download yt-dlp:', error.message);
+            console.error('Failed to download yt-dlp:', error);
             throw error;
         }
     } else {
@@ -30,7 +30,14 @@ export default async function DownloadVideo(videoURL, outputPath) {
 
         return new Promise((resolve, reject) => {
             let ytDlpEventEmitter = ytDlpWrap
-                .exec([videoURL, '-o', outputPath, '--no-audio'])
+                .exec([
+                    videoURL,
+                    '-f',
+                    'bv*[height=1080]',
+                    '-o',
+                    outputPath,
+                    '--no-audio'
+                ])
                 .on('ytDlpEvent', (eventType, eventData) =>
                     console.log(eventType, eventData)
                 )
@@ -38,9 +45,14 @@ export default async function DownloadVideo(videoURL, outputPath) {
                     console.error('Download failed due to error:', error);
                     reject(error);
                 })
-                .on('close', () => {
-                    console.log('Download completed successfully.');
-                    resolve(outputPath);
+                .on('close', (code) => {
+                    if (code !== 0) {
+                        console.error('Error: 1080p video is not available.');
+                        reject(new Error('1080p video is unavailable.'));
+                    } else {
+                        console.log('Download completed successfully.');
+                        resolve(outputPath);
+                    }
                 });
 
             console.log(
