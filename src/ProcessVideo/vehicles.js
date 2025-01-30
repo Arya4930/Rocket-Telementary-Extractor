@@ -1,3 +1,4 @@
+import convert from 'convert-units';
 class Vehicles {
     constructor() {
         this.booster_speed = 0.0;
@@ -99,7 +100,9 @@ class Vehicles {
             ) {
                 this.booster_speed =
                     Math.round(
-                        parseInt(words[i].text.replace(',', '')) * 1.60934 * 100
+                        convert(parseInt(words[i].text.replace(',', '')))
+                            .from('mi')
+                            .to('km') * 100
                     ) / 100;
             }
             if (
@@ -127,9 +130,9 @@ class Vehicles {
                 ) {
                     this.ship_speed =
                         Math.round(
-                            parseInt(words[i].text.replace(',', '')) *
-                                1.60934 *
-                                100
+                            convert(parseInt(words[i].text.replace(',', '')))
+                                .from('mi')
+                                .to('km') * 100
                         ) / 100;
                 }
                 if (
@@ -147,19 +150,31 @@ class Vehicles {
 
         if (totalSeconds > 407) {
             this.booster_altitude =
-                Math.round(this.booster_altitude * 0.0003048 * 100) / 100;
+                Math.round(
+                    convert(this.booster_altitude).from('ft').to('km') * 100
+                ) / 100;
             this.ship_altitude =
-                Math.round(this.ship_altitude * 1.60934 * 100) / 100;
+                Math.round(
+                    convert(this.ship_altitude).from('mi').to('km') * 100
+                ) / 100;
         } else if (totalSeconds > 218) {
             this.booster_altitude =
-                Math.round(this.booster_altitude * 1.60934 * 100) / 100;
+                Math.round(
+                    convert(this.booster_altitude).from('mi').to('km') * 100
+                ) / 100;
             this.ship_altitude =
-                Math.round(this.ship_altitude * 1.60934 * 100) / 100;
+                Math.round(
+                    convert(this.ship_altitude).from('mi').to('km') * 100
+                ) / 100;
         } else {
             this.booster_altitude =
-                Math.round(this.booster_altitude * 0.0003048 * 100) / 100;
+                Math.round(
+                    convert(this.booster_altitude).from('ft').to('km') * 100
+                ) / 100;
             this.ship_altitude =
-                Math.round(this.ship_altitude * 0.0003048 * 100) / 100;
+                Math.round(
+                    convert(this.ship_altitude).from('ft').to('km') * 100
+                ) / 100;
         }
         const telemetryData = {
             time: time || 'Not found',
