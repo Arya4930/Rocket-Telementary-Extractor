@@ -4,6 +4,13 @@ from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 import sys
+import os
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+save_dir = os.path.join(base_dir, '../../plots')
+
+os.makedirs(save_dir, exist_ok=True)
+print(f"Save directory created: {save_dir}")
 
 json_file_path = sys.stdin.read()
 with open(json_file_path, 'r') as file:
@@ -20,6 +27,77 @@ booster_speeds = []
 last_time_sec = -1
 last_altitude = None
 
+time_points = []
+ship_speeds = []
+ship_altitudes = []
+ship_lox_percent = []
+ship_ch4_percent = []
+booster_altitudes = []
+booster_lox_percent = []
+booster_ch4_percent = []
+
+for entry in data:
+    if 'time' in entry:
+        time_sec = time_to_seconds(entry['time'])
+        time_points.append(time_sec)
+        ship_speeds.append(entry.get('ship_speed', 0))
+        ship_altitudes.append(entry.get('ship_altitude', 0))
+        ship_lox_percent.append(entry.get('ship_LOX_Percent', 0))
+        ship_ch4_percent.append(entry.get('ship_CH4_Percent', 0))
+        booster_altitudes.append(entry.get('booster_altitude', 0))
+        booster_lox_percent.append(entry.get('booster_LOX_Percent', 0))
+        booster_ch4_percent.append(entry.get('booster_CH4_Percent', 0))
+
+time_points = np.array(time_points)
+
+metrics = [
+    ("ship_speeds", ship_speeds, "Ship Speed"),
+    ("ship_altitudes", ship_altitudes, "Ship Altitude"),
+    ("ship_lox_percent", ship_lox_percent, "Ship LOX Percent"),
+    ("ship_ch4_percent", ship_ch4_percent, "Ship CH4 Percent"),
+    ("booster_altitudes", booster_altitudes, "Booster Altitude"),
+    ("booster_lox_percent", booster_lox_percent, "Booster LOX Percent"),
+    ("booster_ch4_percent", booster_ch4_percent, "Booster CH4 Percent")
+]
+
+for metric_name, metric_values, metric_label in metrics:
+    metric_values = np.array(metric_values)
+    plt.plot(time_points, metric_values, label=metric_label)
+    plt.xlabel('Time (seconds)')
+    plt.ylabel(metric_label)
+    plt.legend()
+    
+    # Save the plot
+    save_path = os.path.join(save_dir, f"{metric_name}.png")
+    plt.savefig(save_path)
+    plt.clf()
+    print(f"Plot saved: {save_path}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 for entry in data:
     if 'time' in entry and 'booster_altitude' in entry and 'booster_speed' in entry:
         time_sec = time_to_seconds(entry['time'])
@@ -32,7 +110,7 @@ for entry in data:
             last_time_sec = time_sec
             last_altitude = altitude
         else:
-            print(f"Duplicate or non-increasing time value found and skipped: time = {entry['time']}, altitude = {altitude}")
+            continue
 
 x_points = np.array(x_points)
 y_points = np.array(y_points)
@@ -63,7 +141,12 @@ else:
     plt.xlabel('Time (seconds)')
     plt.ylabel('Booster Altitude')
     plt.legend()
-    plt.show()
+    
+    # Save the plot
+    save_path = os.path.join(save_dir, "natural_cubic_spline.png")
+    plt.savefig(save_path)
+    print(f"Plot saved: {save_path}")
+    plt.clf()  # Clear the current figure
 
     cs_derivative = cs.derivative()
     y_fine_derivative = cs_derivative(x_fine)
@@ -72,7 +155,12 @@ else:
     plt.xlabel('Time (seconds)')
     plt.ylabel('Derivative of Booster Altitude')
     plt.legend()
-    plt.show()
+    
+    # Save the plot
+    save_path = os.path.join(save_dir, "derivative_natural_cubic_spline.png")
+    plt.savefig(save_path)
+    print(f"Plot saved: {save_path}")
+    plt.clf()  # Clear the current figure
 
     sq_speed = booster_speeds[:len(y_fine_derivative)]**2
     sq_dy = (y_fine_derivative[:len(booster_speeds)]*3600)**2
@@ -92,4 +180,9 @@ else:
     plt.ylabel('Displacement (km)')
     plt.legend()
     plt.title('Displacement vs. Time')
-    plt.show()
+    
+    # Save the plot
+    save_path = os.path.join(save_dir, "displacement_vs_time.png")
+    plt.savefig(save_path)
+    print(f"Plot saved: {save_path}")
+    plt.clf()  # Clear the current figure
