@@ -1,18 +1,21 @@
 import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import getFirstMp4File from '../getVideo/getvidfile.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const InputPath = path.resolve(__dirname, '../../results.json');
+const allfiles = path.join(__dirname, '../../');
 
-async function AnalyzeData(InputPath) {
+async function AnalyzeData() {
+    const InputPath = await getFirstMp4File(allfiles);
+    const outputFilePath = path.join(`${InputPath}/../../results.json`);
     const pythonProcess = spawn('python', ['./src/analyze/analyze.py'], {
         stdio: ['pipe', 'pipe', 'pipe']
     });
 
-    pythonProcess.stdin.write(InputPath);
+    pythonProcess.stdin.write(outputFilePath);
     pythonProcess.stdin.end();
 
     pythonProcess.stdout.on('data', (data) => {
@@ -28,4 +31,4 @@ async function AnalyzeData(InputPath) {
     });
 }
 
-AnalyzeData(InputPath);
+AnalyzeData();
