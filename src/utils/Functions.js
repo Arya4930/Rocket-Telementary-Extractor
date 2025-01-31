@@ -1,3 +1,6 @@
+import { default as yt } from 'yt-dlp-wrap';
+const YTDlpWrap = yt.default;
+
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');
     let hours = parseInt(timeParts[0], 10);

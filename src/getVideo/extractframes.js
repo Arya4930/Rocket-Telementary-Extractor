@@ -1,10 +1,10 @@
 import ffmpeg from 'fluent-ffmpeg';
 
-export default async function extractFrames(videopath) {
+export default async function extractFrames(videopath, directoryPath) {
     return new Promise((resolve, reject) => {
         ffmpeg(videopath)
             .videoFilters('fps=1')
-            .output('./video-dataset/frame_%04d.png')
+            .output(`${directoryPath}/frame_%05d.png`)
             .noAudio()
             .on('start', function (commandLine) {
                 console.log('Started: ' + commandLine);

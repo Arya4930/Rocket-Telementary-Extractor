@@ -10,8 +10,7 @@ export default async function processImages(
 ) {
     const files = fs
         .readdirSync(directoryPath)
-        .filter((file) => /^frame_\d{4}\.png$/.test(file));
-    const results = [];
+        .filter((file) => /^frame_\d{5}\.png$/.test(file));
 
     let skipcount = 0;
     let InCommingData = false;
@@ -29,6 +28,9 @@ export default async function processImages(
             } catch (err) {
                 console.error(`Failed to delete ${filePath}: ${err.message}`);
             }
+            if (skipcount === 0) {
+                timeCtr = 0;
+            }
             continue;
         }
         console.log(`Processing ${filePath}`);
@@ -40,8 +42,18 @@ export default async function processImages(
         ) {
             console.log(`No data found for ${filePath}. Skipping...`);
             fs.unlinkSync(filePath);
+            timeCtr++;
+            if (timeCtr > 20) {
+                console.log(`skipping Next 10 files as all values are 0`);
+                skipcount = 10;
+                continue;
+            }
             continue;
-        } else if (isInt(data) && InCommingData == false) {
+        } else if (
+            isInt(data) &&
+            InCommingData == false &&
+            data.time !== '00:00:00'
+        ) {
             skipcount = data - 2;
             console.log(`Skipping the next ${skipcount} files...`);
             fs.unlinkSync(filePath);
@@ -53,8 +65,8 @@ export default async function processImages(
             // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
             timeCtr++;
             if (timeCtr > 20) {
-                console.log(`skipping Next 10 files as all values are 0`);
-                skipcount = 10;
+                console.log(`skipping Next 60 files as all values are 0`);
+                skipcount = 60;
                 continue;
             }
         }

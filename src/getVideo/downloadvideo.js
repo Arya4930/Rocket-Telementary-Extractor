@@ -64,3 +64,19 @@ export default async function DownloadVideo(videoURL, outputPath) {
         console.error('Download failed:', err.message);
     }
 }
+
+export async function getVideoTitle(videoURL) {
+    try {
+        await ensureYTDlpBinary();
+        const ytDlpWrap = new YTDlpWrap(ytDlpBinaryPath);
+        let metadata = await ytDlpWrap.getVideoInfo(videoURL);
+        let title = metadata.title.trim();
+
+        title = title.replace(/[<>:"'/\\|?*]+/g, '');
+
+        return title;
+    } catch (error) {
+        console.error('Failed to get video title:', error);
+        return null;
+    }
+}

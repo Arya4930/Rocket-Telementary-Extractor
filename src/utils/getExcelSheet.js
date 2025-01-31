@@ -3,7 +3,7 @@ import xl from 'excel4node';
 import { VerifyFuel, VerifyAltitude, VerifySpeed } from './verifyvalues.js';
 import convert from 'convert-units';
 
-export default function getExcelSheet(sheet) {
+export default function getExcelSheet(sheet, excelPath) {
     const jsonData = JSON.parse(fs.readFileSync(sheet, 'utf8'));
 
     const wb = new xl.Workbook();
@@ -176,7 +176,7 @@ export default function getExcelSheet(sheet) {
         );
     });
 
-    wb.write('./results.xlsx', (err) => {
+    wb.write(excelPath, (err) => {
         if (err) {
             console.error('Error writing Excel file:', err);
         } else {
