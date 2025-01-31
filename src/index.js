@@ -18,6 +18,7 @@ const __dirname = import.meta.dirname;
 
 const directoryPath = './video-dataset';
 const outputFilePath = './results.json';
+const allfiles = path.join(__dirname, '../');
 
 let videoPath;
 const rocketType = argv.r || 'Starship';
@@ -45,7 +46,10 @@ async function main() {
         if (!files.some((file) => file.startsWith('frame_'))) {
             await extractFrames(videoPath);
         }
-        await processImages(directoryPath, outputFilePath, rocketType);
+        const allfiles2 = await fs.promises.readdir(allfiles);
+        if (!allfiles2.includes('results.json')) {
+            await processImages(directoryPath, outputFilePath, rocketType);
+        }
         getExcelSheet(outputFilePath);
     } catch (err) {
         console.error('Error:', err);

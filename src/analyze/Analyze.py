@@ -29,6 +29,7 @@ last_altitude = None
 
 time_points = []
 ship_speeds = []
+booster_nonpolated_speeds = []
 ship_altitudes = []
 ship_lox_percent = []
 ship_ch4_percent = []
@@ -41,6 +42,7 @@ for entry in data:
         time_sec = time_to_seconds(entry['time'])
         time_points.append(time_sec)
         ship_speeds.append(entry.get('ship_speed', 0))
+        booster_nonpolated_speeds.append(entry.get('booster_speed', 0))
         ship_altitudes.append(entry.get('ship_altitude', 0))
         ship_lox_percent.append(entry.get('ship_LOX_Percent', 0))
         ship_ch4_percent.append(entry.get('ship_CH4_Percent', 0))
@@ -52,10 +54,11 @@ time_points = np.array(time_points)
 
 metrics = [
     ("ship_speeds", ship_speeds, "Ship Speed"),
+    ("booster_speeds", booster_nonpolated_speeds, "Booster Speed"),
     ("ship_altitudes", ship_altitudes, "Ship Altitude"),
+    ("booster_altitudes", booster_altitudes, "Booster Altitude"),
     ("ship_lox_percent", ship_lox_percent, "Ship LOX Percent"),
     ("ship_ch4_percent", ship_ch4_percent, "Ship CH4 Percent"),
-    ("booster_altitudes", booster_altitudes, "Booster Altitude"),
     ("booster_lox_percent", booster_lox_percent, "Booster LOX Percent"),
     ("booster_ch4_percent", booster_ch4_percent, "Booster CH4 Percent")
 ]
@@ -69,34 +72,10 @@ for metric_name, metric_values, metric_label in metrics:
     
     # Save the plot
     save_path = os.path.join(save_dir, f"{metric_name}.png")
-    plt.savefig(save_path)
-    plt.clf()
-    print(f"Plot saved: {save_path}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if (metric_name == "booster_speeds" or metric_name == "booster_altitudes" or metric_name == "booster_ch4_percent") and len(time_points) > 1:
+        plt.savefig(save_path)
+        plt.clf()
+        print(f"Plot saved: {save_path}")
 
 for entry in data:
     if 'time' in entry and 'booster_altitude' in entry and 'booster_speed' in entry:
