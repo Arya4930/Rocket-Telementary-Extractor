@@ -34,8 +34,6 @@ export async function finalizeJsonFile() {
         const allfiles = path.join(__dirname, '../../');
         const InputPath = await getFirstMp4File(allfiles);
         const outputFilePath = path.join(`${InputPath}/../../results.json`);
-        console.log(outputFilePath);
-
         if (!fs.existsSync(outputFilePath)) return;
 
         let jsonString = fs.readFileSync(outputFilePath, 'utf8').trim();
