@@ -10,6 +10,7 @@ import path from 'path';
 import DownloadVideo from './getVideo/downloadvideo.js';
 import fs from 'fs';
 import minimist from 'minimist';
+import { finalizeJsonFile } from './utils/Functions.js';
 
 const argv = minimist(process.argv.slice(2));
 ffmpeg.setFfmpegPath(ffmpegPath.path);
@@ -18,6 +19,20 @@ const __dirname = import.meta.dirname;
 
 let videoPath;
 let title;
+
+['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) =>
+    process.on(signal, async () => {
+        console.log('\n🛑Finalizing JSON file...');
+        await finalizeJsonFile();
+        process.exit();
+    })
+);
+process.on('exit', async () => await finalizeJsonFile());
+process.on('uncaughtException', async (err) => {
+    console.error('❌ Uncaught Exception:', err);
+    await finalizeJsonFile();
+    process.exit(1);
+});
 
 async function main() {
     const allfiles = path.join(__dirname, '../');

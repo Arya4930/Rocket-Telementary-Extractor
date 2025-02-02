@@ -6,7 +6,7 @@ import getFirstMp4File from '../getVideo/getvidfile.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const allfiles = path.join(__dirname, '../../');
+export const allfiles = path.join(__dirname, '../../');
 
 async function AnalyzeData() {
     try {

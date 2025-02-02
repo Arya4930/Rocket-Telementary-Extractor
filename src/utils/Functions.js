@@ -1,3 +1,7 @@
+import fs from 'fs';
+import path from 'path';
+import getFirstMp4File from '../getVideo/getvidfile.js';
+
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');
     let hours = parseInt(timeParts[0], 10);
@@ -22,4 +26,30 @@ export function isInt(value) {
             return (x | 0) === x;
         })(parseFloat(value))
     );
+}
+
+const __dirname = import.meta.dirname;
+export async function finalizeJsonFile() {
+    try {
+        const allfiles = path.join(__dirname, '../../');
+        const InputPath = await getFirstMp4File(allfiles);
+        const outputFilePath = path.join(`${InputPath}/../../results.json`);
+        console.log(outputFilePath);
+
+        if (!fs.existsSync(outputFilePath)) return;
+
+        let jsonString = fs.readFileSync(outputFilePath, 'utf8').trim();
+        if (jsonString.endsWith(']')) {
+            console.log('✅ JSON already valid.');
+            return;
+        }
+        jsonString = jsonString.replace(/,\s*$/, '');
+        if (!jsonString.endsWith(']')) {
+            jsonString += '\n]';
+        }
+        fs.writeFileSync(outputFilePath, jsonString, 'utf8');
+        console.log('✅ JSON file finalized properly.');
+    } catch (error) {
+        console.error('❌ Error finalizing JSON file:', error);
+    }
 }
