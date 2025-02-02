@@ -1,6 +1,11 @@
 import fs from 'fs';
 import xl from 'excel4node';
-import { VerifyFuel, VerifyAltitude, VerifySpeed } from './verifyvalues.js';
+import {
+    VerifyFuel,
+    VerifyAltitude,
+    VerifySpeed,
+    saveJsonToFile
+} from './verifyvalues.js';
 import convert from 'convert-units';
 
 export default function getExcelSheet(sheet, excelPath) {
@@ -49,6 +54,9 @@ export default function getExcelSheet(sheet, excelPath) {
         let booster_speedinms = Math.round((booster_speed / 3.6) * 100) / 100;
         let ship_speedinms = Math.round((ship_speed / 3.6) * 100) / 100;
 
+        let previous_booster_speed = 0;
+        let previous_ship_speed = 0;
+
         if (rowIndex > 0 && rowIndex + 1 < jsonData.length) {
             jsonData[rowIndex].booster_speed = await VerifySpeed(
                 jsonData,
@@ -96,6 +104,8 @@ export default function getExcelSheet(sheet, excelPath) {
             ship_speed = await jsonData[rowIndex].ship_speed;
             booster_altitude = await jsonData[rowIndex].booster_altitude;
             ship_altitude = await jsonData[rowIndex].ship_altitude;
+            previous_booster_speed = await jsonData[rowIndex - 1].booster_speed;
+            previous_ship_speed = await jsonData[rowIndex - 1].ship_speed;
 
             booster_speedinms =
                 Math.round(
@@ -104,21 +114,20 @@ export default function getExcelSheet(sheet, excelPath) {
             ship_speedinms =
                 Math.round(convert(ship_speed).from('km/h').to('m/s') * 100) /
                 100;
-            const previous_booster_speed = jsonData[rowIndex - 1].booster_speed;
-            const previous_ship_speed = jsonData[rowIndex - 1].ship_speed;
 
             const previousBoosterSpeedinms =
                 Math.round(
                     convert(previous_booster_speed).from('km/h').to('m/s') * 100
                 ) / 100;
-            booster_acceleration = booster_speedinms - previousBoosterSpeedinms;
-
             const previousShipSpeedinms =
                 Math.round(
                     convert(previous_ship_speed).from('km/h').to('m/s') * 100
                 ) / 100;
+            booster_acceleration = booster_speedinms - previousBoosterSpeedinms;
             ship_acceleration = ship_speedinms - previousShipSpeedinms;
         }
+
+        await saveJsonToFile(jsonData, sheet);
 
         ws.cell(rowIndex + 2, 2).number(
             booster_speed === null || isNaN(booster_speed) ? 0 : booster_speed

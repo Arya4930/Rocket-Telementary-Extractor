@@ -67,6 +67,7 @@ export default async function processImages(
             if (timeCtr > 20) {
                 console.log(`skipping Next 60 files as all values are 0`);
                 skipcount = 60;
+                InCommingData = false;
                 continue;
             }
         }

@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 export async function VerifySpeed(jsonData, rowIndex, type) {
     let verifiedSpeed =
         type === 'Booster'
@@ -29,8 +31,16 @@ export async function VerifySpeed(jsonData, rowIndex, type) {
                 type === 'Booster' ? 'booster_speed' : 'ship_speed'
             ];
 
-        if (previousSpeed !== undefined && nextSpeed !== undefined) {
+        if (
+            previousSpeed !== undefined &&
+            nextSpeed !== undefined &&
+            previousSpeed !== 0 &&
+            nextSpeed !== 0
+        ) {
             verifiedSpeed = Math.round((previousSpeed + nextSpeed) / 2);
+            console.log(
+                `Changed value of speed at ${jsonData[rowIndex].time} to ${verifiedSpeed}`
+            );
         }
         offset++;
     }
@@ -68,9 +78,17 @@ export async function VerifyAltitude(jsonData, rowIndex, type) {
                 type === 'Booster' ? 'booster_altitude' : 'ship_altitude'
             ];
 
-        if (previousAltitude !== undefined && nextAltitude !== undefined) {
+        if (
+            previousAltitude !== undefined &&
+            nextAltitude !== undefined &&
+            previousAltitude !== 0 &&
+            nextAltitude !== 0
+        ) {
             verifiedAltitude = Math.round(
                 (previousAltitude + nextAltitude) / 2
+            );
+            console.log(
+                `Changed value of speed at ${jsonData[rowIndex].time} to ${verifiedAltitude}`
             );
         }
         offset++;
@@ -111,4 +129,13 @@ export async function VerifyFuel(jsonData, rowIndex, type) {
         offset++;
     }
     return verifyFuel;
+}
+
+export async function saveJsonToFile(jsonData, filePath) {
+    try {
+        const jsonString = JSON.stringify(jsonData, null, 4);
+        fs.writeFileSync(filePath, jsonString, 'utf8');
+    } catch (error) {
+        console.error('❌ Error writing JSON file:', error);
+    }
 }

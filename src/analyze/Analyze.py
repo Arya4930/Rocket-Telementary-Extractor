@@ -6,13 +6,15 @@ from scipy.integrate import quad
 import sys
 import os
 
+inp = sys.stdin.read().split("\n")
+json_file_path = inp[0]
+plots_path = inp[1]
 base_dir = os.path.abspath(os.path.dirname(__file__))
-save_dir = os.path.join(base_dir, '../../plots')
+save_dir = os.path.join(base_dir, plots_path)
 
 os.makedirs(save_dir, exist_ok=True)
 print(f"Save directory created: {save_dir}")
 
-json_file_path = sys.stdin.read()
 with open(json_file_path, 'r') as file:
     data = json.load(file)
 

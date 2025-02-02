@@ -9,21 +9,20 @@ import { getVideoTitle } from './getVideo/downloadvideo.js';
 import path from 'path';
 import DownloadVideo from './getVideo/downloadvideo.js';
 import fs from 'fs';
-
-ffmpeg.setFfmpegPath(ffmpegPath.path);
-
 import minimist from 'minimist';
 
 const argv = minimist(process.argv.slice(2));
+ffmpeg.setFfmpegPath(ffmpegPath.path);
+
 const __dirname = import.meta.dirname;
 
 let videoPath;
-const rocketType = argv.r || 'Starship';
 let title;
 
 async function main() {
     const allfiles = path.join(__dirname, '../');
     videoPath = argv.v || (await getFirstMp4File(allfiles));
+    const rocketType = argv.r || 'Starship';
     if (!videoPath) {
         console.error(
             'No video provided and no MP4 files found in the video-dataset folder.'
