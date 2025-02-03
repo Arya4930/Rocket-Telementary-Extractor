@@ -34,8 +34,14 @@ export default async function processImages(
             continue;
         }
         console.log(`Processing ${filePath}`);
+        const start = performance.now();
         const data = await analyzeImageFromFile(filePath, rocketType, time);
-        const values = Object.values(data).slice(1);
+        const end = performance.now();
+        console.log(`Time taken to execute frame ${file} is ${end - start}ms.`);
+        let values;
+        if (data) {
+            values = Object.values(data).slice(1);
+        }
         if (
             !data ||
             (typeof data === 'object' && Object.keys(data).length === 0) ||

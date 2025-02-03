@@ -117,6 +117,12 @@ export default async function analyzeImageFromFile(
             }
         }
     } catch (error) {
-        console.error('Error analyzing image:', error);
+        if (error.code === 'ENOTFOUND') {
+            console.log(
+                'Error analyzing frame: Not able to get Azure Cognitive services'
+            );
+        } else {
+            console.error('Error analyzing image:', error);
+        }
     }
 }

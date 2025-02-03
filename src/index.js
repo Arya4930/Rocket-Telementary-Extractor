@@ -22,7 +22,7 @@ let title;
 
 ['SIGINT', 'SIGTERM', 'SIGQUIT'].forEach((signal) =>
     process.on(signal, async () => {
-        console.log('\n🛑Finalizing JSON file...');
+        console.log('\n🛑 Finalizing JSON file...');
         await finalizeJsonFile();
         process.exit();
     })
@@ -77,6 +77,8 @@ async function main() {
         getExcelSheet(outputFilePath, excelPath);
     } catch (err) {
         console.error('Error:', err);
+        console.log('\n🛑 Finalizing JSON file...');
+        await finalizeJsonFile();
     }
 }
 
