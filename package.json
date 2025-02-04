@@ -16,6 +16,7 @@
     "@azure/core-auth": "^1.8.0",
     "@azure/identity": "^4.4.1",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "chalk": "^5.4.1",
     "convert-units": "^2.3.4",
     "dotenv": "^16.4.5",
     "excel4node": "^1.8.2",

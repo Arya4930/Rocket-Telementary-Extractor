@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
 import { isInt } from '../utils/Functions.js';
+import chalk from 'chalk';
 
 export default async function processImages(
     directoryPath,
@@ -33,33 +34,47 @@ export default async function processImages(
             }
             continue;
         }
-        console.log(`Processing ${filePath}`);
+        console.log(
+            chalk.blue(
+                '==========================================================='
+            )
+        );
+        console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
         const start = performance.now();
         const data = await analyzeImageFromFile(filePath, rocketType, time);
         const end = performance.now();
-        console.log(`Time taken to execute frame ${file} is ${end - start}ms.`);
-        let values;
-        if (data) {
+        console.log(
+            chalk.yellow.bold(
+                `Time taken to execute frame ${file}: ${((end - start) / 1000).toFixed(2)}s.`
+            )
+        );
+
+        let values = [];
+        if (typeof data === 'object' && data !== null) {
             values = Object.values(data).slice(1);
         }
+
         if (
             !data ||
             (typeof data === 'object' && Object.keys(data).length === 0) ||
-            (values.every((val) => val === 0) && InCommingData == false)
+            (Array.isArray(values) &&
+                values.length > 0 &&
+                values.every((val) => val === 0) &&
+                !InCommingData)
         ) {
             console.log(`No data found for ${filePath}. Skipping...`);
             fs.unlinkSync(filePath);
             timeCtr++;
-            console.log(timeCtr);
             if (timeCtr > 20) {
-                console.log(`skipping Next 60 files as all values are 0`);
+                console.log(`Skipping Next 60 files as all values are 0`);
                 skipcount = 60;
                 continue;
             }
             continue;
         } else if (
+            typeof data === 'number' &&
             isInt(data) &&
-            InCommingData == false &&
+            !InCommingData &&
             data.time !== '00:00:00'
         ) {
             skipcount = data - 2;
@@ -67,6 +82,7 @@ export default async function processImages(
             fs.unlinkSync(filePath);
             continue;
         }
+
         time = data.time;
         if (values.every((val) => val === 0)) {
             // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
