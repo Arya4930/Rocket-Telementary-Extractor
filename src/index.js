@@ -34,7 +34,7 @@ process.on('uncaughtException', async (err) => {
     process.exit(1);
 });
 
-async function main() {
+export async function main() {
     const allfiles = path.join(__dirname, '../');
     videoPath = argv.v || (await getFirstMp4File(allfiles));
     const rocketType = argv.r || 'Starship';

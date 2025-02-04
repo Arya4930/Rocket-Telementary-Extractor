@@ -38,9 +38,6 @@ export async function VerifySpeed(jsonData, rowIndex, type) {
             nextSpeed !== 0
         ) {
             verifiedSpeed = Math.round((previousSpeed + nextSpeed) / 2);
-            console.log(
-                `Changed value of speed at ${jsonData[rowIndex].time} to ${verifiedSpeed}`
-            );
         }
         offset++;
     }
@@ -86,9 +83,6 @@ export async function VerifyAltitude(jsonData, rowIndex, type) {
         ) {
             verifiedAltitude = Math.round(
                 (previousAltitude + nextAltitude) / 2
-            );
-            console.log(
-                `Changed value of speed at ${jsonData[rowIndex].time} to ${verifiedAltitude}`
             );
         }
         offset++;

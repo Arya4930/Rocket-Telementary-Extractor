@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import getFirstMp4File from '../getVideo/getvidfile.js';
+import getExcelSheet from './getExcelSheet.js';
 
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');
@@ -34,19 +35,28 @@ export async function finalizeJsonFile() {
         const allfiles = path.join(__dirname, '../../');
         const InputPath = await getFirstMp4File(allfiles);
         const outputFilePath = path.join(`${InputPath}/../../results.json`);
-        if (!fs.existsSync(outputFilePath)) return;
+        console.log('📂 JSON File Path:', outputFilePath);
+
+        if (!fs.existsSync(outputFilePath)) {
+            console.log('⚠️ JSON file does not exist. Skipping...');
+            return;
+        }
 
         let jsonString = fs.readFileSync(outputFilePath, 'utf8').trim();
         if (jsonString.endsWith(']')) {
             console.log('✅ JSON already valid.');
-            return;
+        } else {
+            jsonString = jsonString.replace(/,\s*$/, '');
+            if (!jsonString.endsWith(']')) {
+                jsonString += '\n]';
+            }
+            fs.writeFileSync(outputFilePath, jsonString, 'utf8');
+            console.log('📌 JSON fixed and written.');
         }
-        jsonString = jsonString.replace(/,\s*$/, '');
-        if (!jsonString.endsWith(']')) {
-            jsonString += '\n]';
-        }
-        fs.writeFileSync(outputFilePath, jsonString, 'utf8');
-        console.log('✅ JSON file finalized properly.');
+
+        const excelPath = path.join(`${InputPath}/../../results.xlsx`);
+        getExcelSheet(outputFilePath, excelPath);
+        console.log('✅ JSON file finalized and Excel sheet created.');
     } catch (error) {
         console.error('❌ Error finalizing JSON file:', error);
     }
