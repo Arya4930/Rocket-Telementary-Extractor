@@ -1,14 +1,9 @@
 import fs from 'fs';
 import xl from 'excel4node';
-import {
-    VerifyFuel,
-    VerifyAltitude,
-    VerifySpeed,
-    saveJsonToFile
-} from './verifyvalues.js';
 import convert from 'convert-units';
+import { fixjson } from './fixjson.js';
 
-export default function getExcelSheet(sheet, excelPath) {
+export default async function getExcelSheet(sheet, excelPath) {
     const jsonData = JSON.parse(fs.readFileSync(sheet, 'utf8'));
 
     const wb = new xl.Workbook();
@@ -40,6 +35,7 @@ export default function getExcelSheet(sheet, excelPath) {
             .style(headerStyle);
         ws.column(index + 1).setWidth(header.length);
     });
+    await fixjson(jsonData, sheet);
     jsonData.forEach(async (item, rowIndex) => {
         ws.cell(rowIndex + 2, 1).string(item.time || 'Not found');
 
@@ -58,63 +54,6 @@ export default function getExcelSheet(sheet, excelPath) {
         let previous_ship_speed = 0;
 
         if (rowIndex > 0 && rowIndex + 1 < jsonData.length) {
-            jsonData[rowIndex].booster_speed = await VerifySpeed(
-                jsonData,
-                rowIndex,
-                'Booster'
-            );
-            jsonData[rowIndex].ship_speed = await VerifySpeed(
-                jsonData,
-                rowIndex,
-                'Ship'
-            );
-
-            jsonData[rowIndex].booster_altitude = await VerifyAltitude(
-                jsonData,
-                rowIndex,
-                'Booster'
-            );
-            jsonData[rowIndex].ship_altitude = await VerifyAltitude(
-                jsonData,
-                rowIndex,
-                'Ship'
-            );
-            jsonData[rowIndex].booster_LOX_Percent = await VerifyFuel(
-                jsonData,
-                rowIndex,
-                'B_lox'
-            );
-            jsonData[rowIndex].booster_CH4_Percent = await VerifyFuel(
-                jsonData,
-                rowIndex,
-                'B_CH4'
-            );
-            jsonData[rowIndex].ship_LOX_Percent = await VerifyFuel(
-                jsonData,
-                rowIndex,
-                'S_LOX'
-            );
-            jsonData[rowIndex].ship_CH4_Percent = await VerifyFuel(
-                jsonData,
-                rowIndex,
-                'S_CH4'
-            );
-
-            booster_speed = await jsonData[rowIndex].booster_speed;
-            ship_speed = await jsonData[rowIndex].ship_speed;
-            booster_altitude = await jsonData[rowIndex].booster_altitude;
-            ship_altitude = await jsonData[rowIndex].ship_altitude;
-            previous_booster_speed = await jsonData[rowIndex - 1].booster_speed;
-            previous_ship_speed = await jsonData[rowIndex - 1].ship_speed;
-
-            booster_speedinms =
-                Math.round(
-                    convert(booster_speed).from('km/h').to('m/s') * 100
-                ) / 100;
-            ship_speedinms =
-                Math.round(convert(ship_speed).from('km/h').to('m/s') * 100) /
-                100;
-
             const previousBoosterSpeedinms =
                 Math.round(
                     convert(previous_booster_speed).from('km/h').to('m/s') * 100
@@ -126,8 +65,6 @@ export default function getExcelSheet(sheet, excelPath) {
             booster_acceleration = booster_speedinms - previousBoosterSpeedinms;
             ship_acceleration = ship_speedinms - previousShipSpeedinms;
         }
-
-        await saveJsonToFile(jsonData, sheet);
 
         ws.cell(rowIndex + 2, 2).number(
             booster_speed === null || isNaN(booster_speed) ? 0 : booster_speed

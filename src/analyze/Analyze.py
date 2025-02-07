@@ -50,7 +50,6 @@ def cspline(metric_name, metric_label):
             y_points.append(metric)
             last_time_sec = time_sec
 
-    # Convert lists to NumPy arrays
     x_points = np.array(x_points, dtype=float)
     y_points = np.array(y_points, dtype=float)
 
@@ -111,7 +110,7 @@ for entry in data:
 time_points = np.array(time_points)
 
 metrics = [
-    ("ship_speed", "Ship Speed"),  # Fix key name
+    ("ship_speed", "Ship Speed"),
     ("booster_speed", "Booster Speed"),
     ("ship_altitude", "Ship Altitude"),
     ("booster_altitude", "Booster Altitude"),
