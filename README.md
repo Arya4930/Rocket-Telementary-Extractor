@@ -10,8 +10,6 @@
 
 🚀 **Currently supports Starship and New Glenn. Falcon 9 and other rockets coming soon!**
 
-### Currently works only for Starship and New Glenn. Support for Falcon-9 and other rockets in progress
-
 This project leverages the Azure Vision API to extract telemetry data shown on the screen from frames, achieving a high accuracy of up to ~99.6%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour video).
 
 ## Requirements
