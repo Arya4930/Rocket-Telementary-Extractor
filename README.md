@@ -6,80 +6,82 @@
 	<br />
 </div>
 
-# Rocket Telemetry Extractor
+### Currently works only for Starship and New Glenn. Support for Falcon-9 and other rockets in progress
 
-🚀 **Currently supports Starship and New Glenn. Falcon 9 and other rockets coming soon!**
+This project leverages the Azure Vision API to extract telemetry data shown on the screen from frames, achieving a high accuracy of up to ~99.6%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour video).
 
-This project leverages the **Azure Vision API** to extract telemetry data from video frames, achieving up to **99.6% accuracy**. However, since it processes frame-by-frame, it takes approximately **2.5 hours to analyze a 1-hour video**.
+## Requirements
 
-## 📌 Features
-- 🚀 Extracts telemetry data from launch videos.
-- 📊 Supports multiple rockets (Starship, New Glenn; more in progress).
-- 🔍 Uses Azure Vision API for **highly accurate** OCR extraction.
-- 🛠️ Supports **both online video links & local video files**.
+Before running the script, you need an Azure Vision API key. (You can get one [here](https://portal.vision.cognitive.azure.com/demo/extract-text-from-images)). After getting your key, follow these steps:
 
----
-
-## 📋 Requirements
-Before running the script, you need an **Azure Vision API key**. Get one [here](https://portal.vision.cognitive.azure.com/demo/extract-text-from-images).
-
-### 1️⃣ Setup Environment Variables
-1. **Create a `.env` file** in the project's root directory.
-2. Add the following lines, replacing `<your-vision-key>` with your Azure Vision API key:
+1. **Create an .env file** in the root directory of the project.
+2. Add the following lines to the .env file, replacing `<your-vision-key>` with your actual Azure Vision API key:
 
 ```bash
-VISION_ENDPOINT="https://ai-ocr-testing.cognitiveservices.azure.com/"
-VISION_KEY="<your-vision-key>"
+   VISION_ENDPOINT="https://ai-ocr-testing.cognitiveservices.azure.com/"
+   VISION_KEY="<your-vision-key>"
 ```
 
----
+# Installation
+Make sure you have Node.js installed, then follow these steps:
 
-## ⚙️ Installation
-Ensure you have **Node.js** installed, then follow these steps:
+1. ### Install dependencies:
 
-### 1️⃣ Install Dependencies:
 ```bash
 npm install
 ```
 
-### 2️⃣ Run the Script:
-You have **three** ways to run the script:
+2. ### Run the script:
+There are 3 ways you can run the script:
+- If you have the video link (This only works for Starship launches):
 
-#### ✅ Using a video link (Works only for **Starship** launches):
 ```bash
 node src/index.js -v "<your-video-link-here>"
 ```
 
-#### ✅ Specifying the rocket name:
+- If you want to specify the rocket name:
+
 ```bash
 node src/index.js -v "<your-video-link-here>" -r "<name-of-the-rocket>"
 ```
 
-#### ✅ Using a **local video file**:
-1. **Download & trim the video** to only include the launch.
-2. **Place it in the `<video-title>/video-dataset/` folder**.
-3. Run:
+- If you have already downloaded and trimmed the video to only the launch footage, place it in the `video-dataset` folder and run:
+
 ```bash
 node src/index.js -r "<name-of-the-rocket>"
 ```
 
-### 🛰️ Supported Rockets:
-- **Starship** (`Starship`)
-- **New Glenn** (`new_glenn`)
+Supported rockets: `Starship`, `new_glenn`. Use these exact names in the `<name-of-the-rocket>` section.
 
-> 🚀 *Write the rocket name exactly as shown above.*
+## Post-Processing and Analysis
 
----
+Since AI OCR may not always be 100% accurate, post-processing tools have been added to refine results:
 
-## 📌 Notes
-- This script **processes every frame**, so it can take a while.
-- Ensure your **Azure Vision API key** has the required permissions & quota.
-- Start your **Microsoft Azure AI journey** [here](https://learn.microsoft.com/en-us/plans/8pkkiy5x76oy7y?tab=tab-created&source=docs&learnerGroupId=440f340c-27d3-4554-9fb2-88fe82a9a692&wt.mc_id=studentamb_447844) *(referral link appreciated!)*
+- **Fixing extracted values:**
+  If the OCR results contain errors, you can run the following command multiple times until you're satisfied with the extracted values (or until they no longer update):
+  
+  ```bash
+  npm run fix
+  ```
+  
+- **Generating analysis graphs:**
+  Once you have corrected the extracted values, you can generate graphs for analysis:
+  
+  ```bash
+  npm run analyze
+  ```
+  
+- **Recommended Workflow:**
+  For better accuracy, run `npm run fix` multiple times if needed, followed by `npm run analyze` to visualize the cleaned data.
 
----
+## Notes
+You can also start your Microsoft Azure AI journey with [this](https://learn.microsoft.com/en-us/plans/8pkkiy5x76oy7y?tab=tab-created&source=docs&learnerGroupId=440f340c-27d3-4554-9fb2-88fe82a9a692&wt.mc_id=studentamb_447844) link. (Yes, this is my referral link, and it would be appreciated if you signed up through it!)
 
-## 📜 License
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+> The script processes every frame of the video, which can take a considerable amount of time.
 
-💡 **Contributions welcome!** Feel free to submit issues or pull requests. 🚀
+> Ensure your Azure Vision API key has the necessary permissions and quotas for the volume of requests you’re making.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
