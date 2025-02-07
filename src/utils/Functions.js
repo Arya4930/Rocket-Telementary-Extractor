@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import getFirstMp4File from '../getVideo/getvidfile.js';
-import getExcelSheet from './getExcelSheet.js';
+import getExcelSheet from '../finalize/getExcelSheet.js';
 
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');

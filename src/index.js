@@ -1,7 +1,7 @@
 import ffmpegPath from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import 'dotenv/config';
-import getExcelSheet from './utils/getExcelSheet.js';
+import getExcelSheet from './finalize/getExcelSheet.js';
 import extractFrames from './getVideo/extractframes.js';
 import processImages from './ProcessVideo/processImages.js';
 import getFirstMp4File from './getVideo/getvidfile.js';

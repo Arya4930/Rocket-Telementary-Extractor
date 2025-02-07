@@ -3,7 +3,7 @@ import {
     VerifyAltitude,
     VerifyFuel,
     saveJsonToFile
-} from './verifyvalues.js';
+} from '../utils/verifyvalues.js';
 
 export async function fixjson(jsonData, sheet) {
     jsonData.forEach(async (item, rowIndex) => {
