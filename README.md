@@ -5,6 +5,9 @@
 	</p>
 	<br />
 </div>
+# Rocket Telemetry Extractor
+
+🚀 **Currently supports Starship and New Glenn. Falcon 9 and other rockets coming soon!**
 
 ### Currently works only for Starship and New Glenn. Support for Falcon-9 and other rockets in progress
 
@@ -81,7 +84,9 @@ You can also start your Microsoft Azure AI journey with [this](https://learn.mic
 
 > Ensure your Azure Vision API key has the necessary permissions and quotas for the volume of requests you’re making.
 
-## License
+## 📜 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+💡 **Contributions welcome!** Feel free to submit issues or pull requests. 🚀
 
