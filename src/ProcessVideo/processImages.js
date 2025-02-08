@@ -3,6 +3,8 @@ import path from 'path';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
 import { isInt } from '../utils/Functions.js';
 import chalk from 'chalk';
+import CropImages from './Croplmages.js';
+import sharp from 'sharp';
 
 export default async function processImages(
     directoryPath,
@@ -12,11 +14,17 @@ export default async function processImages(
     const files = fs
         .readdirSync(directoryPath)
         .filter((file) => /^frame_\d{5}\.png$/.test(file));
-
     let skipcount = 0;
     let InCommingData = false;
+    let firstTimeData = false;
     let time = null;
     let timeCtr = 0;
+
+    const CheckFile = path.join(directoryPath, files[1]);
+    const metadata = await sharp(CheckFile).metadata();
+    if (metadata.width === 1920 && metadata.height === 190) {
+        firstTimeData = true;
+    }
 
     fs.writeFileSync(outputFilePath, '[\n');
 
@@ -107,6 +115,10 @@ export default async function processImages(
         InCommingData = true;
         // resetting the time counter
         timeCtr = 0;
+        if (!firstTimeData) {
+            await CropImages(directoryPath);
+            firstTimeData = true;
+        }
     }
 
     fs.appendFileSync(outputFilePath, ']\n');

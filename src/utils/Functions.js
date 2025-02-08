@@ -47,7 +47,7 @@ export async function finalizeJsonFile() {
             console.log('✅ JSON already valid.');
         } else {
             jsonString = jsonString.replace(/,\s*$/, '');
-            if (!jsonString.endsWith(']')) {
+            if (!jsonString.includes(']')) {
                 jsonString += '\n]';
             }
             fs.writeFileSync(outputFilePath, jsonString, 'utf8');
@@ -57,6 +57,7 @@ export async function finalizeJsonFile() {
         const excelPath = path.join(`${InputPath}/../../results.xlsx`);
         getExcelSheet(outputFilePath, excelPath);
         console.log('✅ JSON file finalized and Excel sheet created.');
+        process.exit(1);
     } catch (error) {
         console.error('❌ Error finalizing JSON file:', error);
     }

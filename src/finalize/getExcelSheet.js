@@ -126,8 +126,7 @@ export default async function getExcelSheet(sheet, excelPath) {
         if (err) {
             console.error('Error writing Excel file:', err);
         } else {
-            console.log('Excel file created successfully!');
+            return console.log('Excel file created successfully!');
         }
     });
-    return;
 }

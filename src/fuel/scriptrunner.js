@@ -19,10 +19,10 @@ async function CropImages(img, regions) {
 
 export async function GetFuel(img) {
     const regions = [
-        { name: 'boosterlox', left: 276, top: 1000, width: 240, height: 13 },
-        { name: 'boosterlch4', left: 276, top: 1036, width: 240, height: 13 },
-        { name: 'shiplox', left: 1455, top: 1000, width: 240, height: 13 },
-        { name: 'shiplch4', left: 1455, top: 1031, width: 240, height: 13 }
+        { name: 'boosterlox', left: 276, top: 110, width: 240, height: 13 },
+        { name: 'boosterlch4', left: 276, top: 146, width: 240, height: 13 },
+        { name: 'shiplox', left: 1455, top: 110, width: 240, height: 13 },
+        { name: 'shiplch4', left: 1455, top: 141, width: 240, height: 13 }
     ];
 
     const fileNames = await CropImages(img, regions);

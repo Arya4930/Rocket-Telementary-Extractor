@@ -8,7 +8,7 @@ class Vehicles {
         this.boosterloxPercent = 100.0;
         this.boosterch4Percent = 100.0;
         this.shiploxPercent = 97.0;
-        this.shipch4Percent = 94.0;
+        this.shipch4Percent = 95.0;
     }
 
     starship(words, time, Fuel) {
