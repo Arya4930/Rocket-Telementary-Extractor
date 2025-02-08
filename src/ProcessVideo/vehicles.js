@@ -11,7 +11,7 @@ class Vehicles {
         this.shipch4Percent = 94.0;
     }
 
-    starship(words, time, shipFuel, BoosterFuel) {
+    starship(words, time, Fuel) {
         if (words[0].text !== 'SPEED') {
             words.shift();
         }
@@ -29,12 +29,11 @@ class Vehicles {
                 break;
             }
         }
-        const boosterfuel = BoosterFuel.split('\r\n');
         this.boosterloxPercent = parseFloat(
-            parseFloat(boosterfuel[0]).toFixed(2) + 0.42
+            parseFloat(Fuel[0]).toFixed(2) + 0.42
         );
         this.boosterch4Percent = parseFloat(
-            parseFloat(boosterfuel[1]).toFixed(2) + 0.42
+            parseFloat(Fuel[1]).toFixed(2) + 0.42
         );
 
         if (totalSeconds < 150) {
@@ -43,12 +42,11 @@ class Vehicles {
             this.shiploxPercent = 97.0;
             this.shipch4Percent = 94.0;
         } else {
-            const ShipFuel = shipFuel.split('\r\n');
             this.shiploxPercent = parseFloat(
-                parseFloat(ShipFuel[0]).toFixed(2) - 0.42
+                parseFloat(Fuel[2]).toFixed(2) - 0.42
             );
             this.shipch4Percent = parseFloat(
-                parseFloat(ShipFuel[1]).toFixed(2) - 0.42
+                parseFloat(Fuel[3]).toFixed(2) - 0.42
             );
             for (let i = 0; i < words.length; i++) {
                 if (words[i].text === 'ALTITUDE' && words[i + 1]) {

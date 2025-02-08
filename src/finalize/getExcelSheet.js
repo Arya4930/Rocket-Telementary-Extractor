@@ -129,4 +129,5 @@ export default async function getExcelSheet(sheet, excelPath) {
             console.log('Excel file created successfully!');
         }
     });
+    return;
 }

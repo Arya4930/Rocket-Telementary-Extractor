@@ -3,7 +3,7 @@ import CreateClient from '@azure-rest/ai-vision-image-analysis';
 const createClient = CreateClient.default;
 import { AzureKeyCredential } from '@azure/core-auth';
 import Vehicles from './vehicles.js';
-import { GetBoosterFuel, GetShipFuel } from '../fuel/scriptrunner.js';
+import { GetFuel } from '../fuel/scriptrunner.js';
 import { IncremenetTimeBy1second } from '../utils/Functions.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
@@ -104,14 +104,8 @@ export default async function analyzeImageFromFile(
             }
 
             if (rocketType === 'Starship') {
-                const BoosterFuel = await GetBoosterFuel(imagePath);
-                const shipFuel = await GetShipFuel(imagePath);
-                return vehicleInstances.starship(
-                    words,
-                    time,
-                    shipFuel,
-                    BoosterFuel
-                );
+                const Fuel = await GetFuel(imagePath);
+                return vehicleInstances.starship(words, time, Fuel);
             } else if (rocketType === 'new_glenn') {
                 return vehicleInstances.new_glenn(words, time);
             }

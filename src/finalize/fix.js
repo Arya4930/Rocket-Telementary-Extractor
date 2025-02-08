@@ -2,7 +2,6 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import getFirstMp4File from '../getVideo/getvidfile.js';
 import getExcelSheet from './getExcelSheet.js';
-import fs from 'fs';
 
 async function fix() {
     const __filename = fileURLToPath(import.meta.url);

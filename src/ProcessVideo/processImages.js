@@ -11,7 +11,7 @@ export default async function processImages(
 ) {
     const files = fs
         .readdirSync(directoryPath)
-        .filter((file) => /^frame_\d{5}\.png$/.test(file));
+        .filter((file) => /^frame_\d{4}\.png$/.test(file));
 
     let skipcount = 0;
     let InCommingData = false;
@@ -87,7 +87,7 @@ export default async function processImages(
         if (values.every((val) => val === 0)) {
             // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
             timeCtr++;
-            console.log(timeCtr);
+            fs.unlinkSync(filePath);
             if (timeCtr > 20) {
                 console.log(`skipping Next 60 files as all values are 0`);
                 skipcount = 60;
