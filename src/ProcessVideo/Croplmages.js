@@ -5,7 +5,7 @@ import sharp from 'sharp';
 export default async function CropImages(directoryPath) {
     const files = fs
         .readdirSync(directoryPath)
-        .filter((file) => /^frame_\d{4}\.png$/.test(file));
+        .filter((file) => /^frame_\d{5}\.png$/.test(file));
 
     for (const file of files) {
         const filePath = path.join(directoryPath, file);
