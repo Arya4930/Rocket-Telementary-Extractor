@@ -1,21 +1,6 @@
 import sharp from 'sharp';
 import workerpool from './workerpool.js';
-
-async function CropImages(img, regions) {
-    const fileNames = [];
-    try {
-        for (const { name, left, top, width, height } of regions) {
-            const outputPath = `${img}.${name}.png`;
-            await sharp(img)
-                .extract({ left, top, width, height })
-                .toFile(outputPath);
-            fileNames.push(outputPath);
-        }
-        return fileNames;
-    } catch (err) {
-        console.error(`Error in image processing: ${err.message}`);
-    }
-}
+import CropImages from '../ProcessVideo/Croplmages.js';
 
 export async function GetFuel(img) {
     const regions = [
@@ -26,5 +11,5 @@ export async function GetFuel(img) {
     ];
 
     const fileNames = await CropImages(img, regions);
-    return Promise.all(fileNames.map((file) => workerpool.runTask(file)));
+    return Promise.all(fileNames.map((file) => workerpool.runFuelTask(file)));
 }

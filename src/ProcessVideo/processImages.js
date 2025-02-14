@@ -13,7 +13,7 @@ export default async function processImages(
 ) {
     const files = fs
         .readdirSync(directoryPath)
-        .filter((file) => /^frame_\d{5}\.png$/.test(file));
+        .filter((file) => /^frame_\d{4}\.png$/.test(file));
     let skipcount = 0;
     let InCommingData = false;
     let firstTimeData = false;

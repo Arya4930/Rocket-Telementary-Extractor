@@ -16,7 +16,7 @@ class WorkerPool {
         }
     }
 
-    runTask(data) {
+    runFuelTask(data) {
         return new Promise((resolve, reject) => {
             // console.log(`Queue length before task: ${this.queue.length}`);
             const worker = this.workers.pop();

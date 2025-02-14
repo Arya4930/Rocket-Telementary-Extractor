@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import getFirstMp4File from '../getVideo/getvidfile.js';
 import getExcelSheet from '../finalize/getExcelSheet.js';
+import sharp from 'sharp';
+const __dirname = import.meta.dirname;
 
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');
@@ -28,8 +30,6 @@ export function isInt(value) {
         })(parseFloat(value))
     );
 }
-
-const __dirname = import.meta.dirname;
 export async function finalizeJsonFile() {
     try {
         const allfiles = path.join(__dirname, '../../');
@@ -60,5 +60,21 @@ export async function finalizeJsonFile() {
         process.exit(1);
     } catch (error) {
         console.error('❌ Error finalizing JSON file:', error);
+    }
+}
+
+export async function CropImages(img, regions) {
+    const fileNames = [];
+    try {
+        for (const { name, left, top, width, height } of regions) {
+            const outputPath = `${img}.${name}.png`;
+            await sharp(img)
+                .extract({ left, top, width, height })
+                .toFile(outputPath);
+            fileNames.push(outputPath);
+        }
+        return fileNames;
+    } catch (err) {
+        console.error(`Error in image processing: ${err.message}`);
     }
 }

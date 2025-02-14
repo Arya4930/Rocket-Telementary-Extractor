@@ -75,6 +75,7 @@ export async function main() {
             await processImages(directoryPath, outputFilePath, rocketType);
         }
         getExcelSheet(outputFilePath, excelPath);
+        process.exit(1);
     } catch (err) {
         console.error('Error:', err);
         console.log('\n🛑 Finalizing JSON file...');

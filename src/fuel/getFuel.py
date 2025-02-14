@@ -22,7 +22,7 @@ for x in range(len(image[0])):
     pixel = image[0, x]
     if np.all(np.abs(pixel - target_color) <= tolerance):
         if all(np.all(np.abs(image[0, x + i] - target_color) <= tolerance) for i in range(1, 6) if x + i < image.shape[1]):
-            first_target_point = (x,)
+            first_target_point = x
             break
 
 if first_target_point:
