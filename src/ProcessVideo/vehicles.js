@@ -9,9 +9,11 @@ class Vehicles {
         this.boosterch4Percent = 100.0;
         this.shiploxPercent = 97.0;
         this.shipch4Percent = 95.0;
+        this.boosterTilt = 0.0;
+        this.shipTilt = 0.0;
     }
 
-    starship(words, time, Fuel) {
+    starship(words, time, Fuel, Tilt) {
         if (words[0].text !== 'SPEED') {
             words.shift();
         }
@@ -35,10 +37,12 @@ class Vehicles {
         this.boosterch4Percent = parseFloat(
             parseFloat(Fuel[1]).toFixed(2) + 0.42
         );
+        this.boosterTilt = parseFloat(Tilt[0]).toFixed(2);
 
         if (totalSeconds < 150) {
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
+            this.shipTilt = this.boosterTilt;
             this.shiploxPercent = 97.0;
             this.shipch4Percent = 94.0;
         } else {
@@ -48,6 +52,7 @@ class Vehicles {
             this.shipch4Percent = parseFloat(
                 parseFloat(Fuel[3]).toFixed(2) - 0.42
             );
+            this.shipTilt = parseFloat(Tilt[1]).toFixed(2);
             for (let i = 0; i < words.length; i++) {
                 if (words[i].text === 'ALTITUDE' && words[i + 1]) {
                     this.ship_altitude = words[i + 1].text;
@@ -66,11 +71,13 @@ class Vehicles {
             ship_altitude: parseInt(this.ship_altitude) || 0,
             ship_LOX_Percent: this.shiploxPercent,
             ship_CH4_Percent: this.shipch4Percent,
+            ship_Tilt: parseFloat(this.shipTilt),
             ...(totalSeconds <= 420 && {
                 booster_speed: parseInt(this.booster_speed) || 0,
                 booster_altitude: parseInt(this.booster_altitude) || 0,
                 booster_LOX_Percent: this.boosterloxPercent,
-                booster_CH4_Percent: this.boosterch4Percent
+                booster_CH4_Percent: this.boosterch4Percent,
+                booster_tilt: parseFloat(this.boosterTilt)
             })
         };
 

@@ -10,7 +10,7 @@ import path from 'path';
 import DownloadVideo from './getVideo/downloadvideo.js';
 import fs from 'fs';
 import minimist from 'minimist';
-import { finalizeJsonFile } from './utils/Functions.js';
+import { finalizeJsonFile } from './finalize/finalizeJson.js';
 
 const argv = minimist(process.argv.slice(2));
 ffmpeg.setFfmpegPath(ffmpegPath.path);

@@ -2,7 +2,8 @@ import {
     VerifySpeed,
     VerifyAltitude,
     VerifyFuel,
-    saveJsonToFile
+    saveJsonToFile,
+    VerifyTilt
 } from '../utils/verifyvalues.js';
 
 export async function fixjson(jsonData, sheet) {
@@ -52,6 +53,16 @@ export async function fixjson(jsonData, sheet) {
                 jsonData,
                 rowIndex,
                 'S_CH4'
+            );
+            jsonData[rowIndex].booster_tilt = await VerifyTilt(
+                jsonData,
+                rowIndex,
+                'B'
+            );
+            jsonData[rowIndex].ship_tilt = await VerifyTilt(
+                jsonData,
+                rowIndex,
+                'S'
             );
         }
 

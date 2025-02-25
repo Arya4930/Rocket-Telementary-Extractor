@@ -5,6 +5,7 @@ import { AzureKeyCredential } from '@azure/core-auth';
 import Vehicles from './vehicles.js';
 import { GetFuel } from '../fuel/scriptrunner.js';
 import { IncremenetTimeBy1second } from '../utils/Functions.js';
+import { GetTilt } from './tilt/scriptrunner.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -105,7 +106,8 @@ export default async function analyzeImageFromFile(
 
             if (rocketType === 'Starship') {
                 const Fuel = await GetFuel(imagePath);
-                return vehicleInstances.starship(words, time, Fuel);
+                const Tilt = await GetTilt(imagePath);
+                return vehicleInstances.starship(words, time, Fuel, Tilt);
             } else if (rocketType === 'new_glenn') {
                 return vehicleInstances.new_glenn(words, time);
             }

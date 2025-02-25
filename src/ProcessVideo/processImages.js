@@ -14,6 +14,11 @@ export default async function processImages(
     const files = fs
         .readdirSync(directoryPath)
         .filter((file) => /^frame_\d{5}\.png$/.test(file));
+    if (!files) {
+        return console.log(
+            'No Images found with the format frame_XXXXX format'
+        );
+    }
     let skipcount = 0;
     let InCommingData = false;
     let firstTimeData = false;

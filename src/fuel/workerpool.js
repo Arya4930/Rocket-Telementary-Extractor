@@ -16,7 +16,7 @@ class WorkerPool {
         }
     }
 
-    runFuelTask(data) {
+    runTask(data) {
         return new Promise((resolve, reject) => {
             // console.log(`Queue length before task: ${this.queue.length}`);
             const worker = this.workers.pop();
@@ -60,4 +60,9 @@ class WorkerPool {
     }
 }
 
-export default new WorkerPool(path.resolve('src/fuel/pythonWorker.js'));
+export const fuelWorkerPool = new WorkerPool(
+    path.resolve('src/fuel/pythonWorker.js')
+);
+export const tiltWorkerPool = new WorkerPool(
+    path.resolve('src/ProcessVideo/tilt/pythonWorker.js')
+);

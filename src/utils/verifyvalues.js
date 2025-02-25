@@ -125,6 +125,34 @@ export async function VerifyFuel(jsonData, rowIndex, type) {
     return verifyFuel;
 }
 
+export async function VerifyTilt(jsonData, rowIndex, type) {
+    const fuel_type = {
+        B: 'booster_tilt',
+        S: 'ship_Tilt'
+    };
+
+    let verifyTilt = jsonData[rowIndex][fuel_type];
+    let offset = 1;
+
+    while (
+        (Math.abs(jsonData[rowIndex - offset]?.[fuel_type] - verifyTilt) > 45 ||
+            Math.abs(jsonData[rowIndex + offset]?.[fuel_type] - verifyTilt) >
+                45 ||
+            verifyTilt === 0) &&
+        rowIndex - offset >= 0 &&
+        rowIndex + offset < jsonData.length
+    ) {
+        const previousTilt = jsonData[rowIndex - offset]?.[fuel_type];
+        const nextTilt = jsonData[rowIndex + offset]?.[fuel_type];
+
+        if (previousTilt !== undefined && nextTilt !== undefined) {
+            verifyTilt = Math.round((previousTilt + nextTilt) / 2);
+        }
+        offset++;
+    }
+    return verifyTilt;
+}
+
 export async function saveJsonToFile(jsonData, filePath) {
     try {
         const jsonString = JSON.stringify(jsonData, null, 4);

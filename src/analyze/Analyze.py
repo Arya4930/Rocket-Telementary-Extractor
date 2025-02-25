@@ -100,6 +100,11 @@ def cspline(metric_name, metric_label):
             plt.legend()
             plt.savefig(os.path.join(save_dir, f"Fuel_spline.png"))
             plt.clf()
+        if ( metric_name == "ship_Tilt" ):
+            plt.ylabel('Tilt Angle')
+            plt.legend()
+            plt.savefig(os.path.join(save_dir, f"Tilt_spline.png"))
+            plt.clf()
 
 time_points = []
 for entry in data:
@@ -117,7 +122,9 @@ metrics = [
     ("ship_LOX_Percent", "Ship LOX Percent"),
     ("ship_CH4_Percent", "Ship CH4 Percent"),
     ("booster_LOX_Percent", "Booster LOX Percent"),
-    ("booster_CH4_Percent", "Booster CH4 Percent")
+    ("booster_CH4_Percent", "Booster CH4 Percent"),
+    ("booster_tilt", "Booster Tilt Angle"),
+    ("ship_Tilt", "Ship Tilt Angle")
 ]
 
 

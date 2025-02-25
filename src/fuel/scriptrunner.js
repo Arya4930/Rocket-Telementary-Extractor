@@ -1,6 +1,5 @@
-import sharp from 'sharp';
-import workerpool from './workerpool.js';
-import CropImages from '../ProcessVideo/Croplmages.js';
+import { fuelWorkerPool } from './workerpool.js';
+import { CropImagesToAnalyze } from '../utils/Functions.js';
 
 export async function GetFuel(img) {
     const regions = [
@@ -10,6 +9,6 @@ export async function GetFuel(img) {
         { name: 'shiplch4', left: 1455, top: 147, width: 240, height: 1 }
     ];
 
-    const fileNames = await CropImages(img, regions);
-    return Promise.all(fileNames.map((file) => workerpool.runFuelTask(file)));
+    const fileNames = await CropImagesToAnalyze(img, regions);
+    return Promise.all(fileNames.map((file) => fuelWorkerPool.runTask(file)));
 }
