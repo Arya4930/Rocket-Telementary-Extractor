@@ -1,3 +1,8 @@
+import 'dotenv/config';
+import 'module-alias/register.js';
+import path from 'path';
+import fs from 'fs';
+import minimist from 'minimist';
 import ffmpegPath from '@ffmpeg-installer/ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import 'dotenv/config';
@@ -6,10 +11,7 @@ import extractFrames from './getVideo/extractframes.js';
 import processImages from './ProcessVideo/processImages.js';
 import getFirstMp4File from './getVideo/getvidfile.js';
 import { getVideoTitle } from './getVideo/downloadvideo.js';
-import path from 'path';
 import DownloadVideo from './getVideo/downloadvideo.js';
-import fs from 'fs';
-import minimist from 'minimist';
 import { finalizeJsonFile } from './finalize/finalizeJson.js';
 
 const argv = minimist(process.argv.slice(2));
@@ -34,7 +36,7 @@ process.on('uncaughtException', async (err) => {
     process.exit(1);
 });
 
-export async function main() {
+async function main() {
     const allfiles = path.join(__dirname, '../');
     videoPath = argv.v || (await getFirstMp4File(allfiles));
     const rocketType = argv.r || 'Starship';
@@ -66,8 +68,12 @@ export async function main() {
         const outputFilePath = path.join(__dirname, `../${title}/results.json`);
         const excelPath = path.join(__dirname, `../${title}/results.xlsx`);
         const alltitlefiles = path.join(__dirname, `../${title}`);
-        const files = await fs.promises.readdir(directoryPath);
-        if (!files.some((file) => file.startsWith('frame_'))) {
+        const files = fs
+            .readdirSync(directoryPath)
+            .filter((file) => /^frame_\d{5}\.png$/.test(file));
+
+        if (!files.length) {
+            console.log('\n🚀 Extracting frames from video...');
             await extractFrames(videoPath, directoryPath);
         }
         const allfiles2 = await fs.promises.readdir(alltitlefiles);

@@ -9,6 +9,9 @@
     "fix": "node src/finalize/fix.js"
   },
   "type": "module",
+  "_moduleAliases": {
+    "@root": "src"
+  },
   "author": "",
   "license": "ISC",
   "description": "",
@@ -25,7 +28,9 @@
     "form-data": "^4.0.0",
     "hh-mm-ss": "^1.2.0",
     "minimist": "^1.2.8",
+    "module-alias": "^2.2.3",
     "sharp": "^0.33.5",
+    "tesseract.js": "^6.0.0",
     "yt-dlp-wrap": "^2.3.12"
   },
   "devDependencies": {

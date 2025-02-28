@@ -27,7 +27,7 @@ if len(x_coords) > 1 and len(y_coords) > 1:
     cov_matrix = np.cov(x_coords, y_coords)
     eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
     angles = np.degrees(np.arctan2(eigenvectors[1, :], eigenvectors[0, :]))
-    print(angles[1])
+    print(angles[0])
 else:
     print(0)
     sys.exit(1)

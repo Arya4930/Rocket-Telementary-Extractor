@@ -34,7 +34,7 @@ secrets.json
 *.mp4
 *.png
 *.xlsx
-*.json
+results.json
 
 # Ignore package-lock.json for npm
 package-lock.json
