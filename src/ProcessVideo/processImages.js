@@ -30,94 +30,102 @@ export default async function processImages(
 
     fs.writeFileSync(outputFilePath, '[\n');
 
-    const results = await Promise.all(
-        files.map(async (file) => {
-            const filePath = path.join(directoryPath, file);
-            if (skipcount > 0) {
-                skipcount--;
-                try {
-                    fs.unlinkSync(filePath);
-                } catch (err) {
-                    console.error(
-                        `Failed to delete ${filePath}: ${err.message}`
-                    );
-                }
-                if (skipcount === 0) {
-                    timeCtr = 0;
-                }
-                return null;
-            }
+    let results = [];
 
-            console.log(
-                chalk.green.bold(`Processing: ${path.basename(filePath)}`)
-            );
-            const start = performance.now();
+    for (const file of files) {
+        const filePath = path.join(directoryPath, file);
 
-            const data = await AnalyzeWorkerPool.runTask({
-                filePath,
-                rocketType,
-                time
-            });
-
-            const end = performance.now();
-            console.log(
-                chalk.yellow.bold(
-                    `Time taken to execute frame ${file}: ${((end - start) / 1000).toFixed(2)}s.`
-                )
-            );
-
-            let values = [];
-            if (typeof data === 'object' && data !== null) {
-                values = Object.values(data).slice(1);
-            }
-
-            if (
-                !data ||
-                (typeof data === 'object' && Object.keys(data).length === 0) ||
-                (Array.isArray(values) &&
-                    values.length > 0 &&
-                    values.every((val) => val === 0) &&
-                    !InCommingData)
-            ) {
-                console.log(`No data found for ${filePath}. Skipping...`);
+        if (skipcount > 0) {
+            skipcount--;
+            try {
                 fs.unlinkSync(filePath);
-                timeCtr++;
-                if (timeCtr > 20) {
-                    console.log(`Skipping Next 60 files as all values are 0`);
-                    skipcount = 60;
-                }
-                return null; // Skip this file
+            } catch (err) {
+                console.error(`Failed to delete ${filePath}: ${err.message}`);
             }
-
-            time = data.time;
-            if (values.every((val) => val === 0)) {
-                timeCtr++;
-                fs.unlinkSync(filePath);
-                if (timeCtr > 20) {
-                    console.log(`Skipping Next 60 files as all values are 0`);
-                    skipcount = 60;
-                    InCommingData = false;
-                }
-                return { file, ...data };
+            if (skipcount === 0) {
+                timeCtr = 0;
             }
+            continue;
+        }
 
-            InCommingData = true;
-            timeCtr = 0;
+        console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
+        const start = performance.now();
 
-            if (!firstTimeData) {
-                await CropImages(directoryPath);
-                firstTimeData = true;
+        const data = await AnalyzeWorkerPool.runTask({
+            filePath,
+            rocketType,
+            time
+        });
+
+        const end = performance.now();
+        console.log(
+            chalk.yellow.bold(
+                `Time taken to execute frame ${file}: ${((end - start) / 1000).toFixed(2)}s.`
+            )
+        );
+
+        let values = [];
+        if (typeof data === 'object' && data !== null) {
+            values = Object.values(data).slice(1);
+        }
+
+        if (
+            !data ||
+            (typeof data === 'object' && Object.keys(data).length === 0) ||
+            (Array.isArray(values) &&
+                values.length > 0 &&
+                values.every((val) => val === 0) &&
+                !InCommingData)
+        ) {
+            console.log(`No data found for ${filePath}. Skipping...`);
+            fs.unlinkSync(filePath);
+            timeCtr++;
+            if (timeCtr > 20) {
+                console.log(`Skipping Next 60 files as all values are 0`);
+                skipcount = 60;
             }
+            continue;
+        }
 
-            return { file, ...data };
-        })
-    );
+        if (
+            typeof data === 'number' &&
+            isInt(data) &&
+            !InCommingData &&
+            data.time !== '00:00:00'
+        ) {
+            skipcount = data - 1;
+            console.log(`Skipping the next ${skipcount} files...`);
+            fs.unlinkSync(filePath);
+            continue;
+        }
+
+        time = data.time;
+        if (values.every((val) => val === 0)) {
+            timeCtr++;
+            fs.unlinkSync(filePath);
+            if (timeCtr > 20) {
+                console.log(`Skipping Next 60 files as all values are 0`);
+                skipcount = 60;
+                InCommingData = false;
+            }
+            continue;
+        }
+
+        InCommingData = true;
+        timeCtr = 0;
+
+        results.push({ file, ...data });
+
+        if (!firstTimeData) {
+            await CropImages(directoryPath);
+            firstTimeData = true;
+        }
+    }
+
+    // Write results at once
     fs.appendFileSync(
         outputFilePath,
-        results
-            .filter(Boolean)
-            .map((r) => JSON.stringify(r, null, 2))
-            .join(',\n') + '\n]\n'
+        results.map((r) => JSON.stringify(r, null, 2)).join(',\n') + '\n]\n'
     );
 
     console.log(`Results saved to ${outputFilePath}`);
