@@ -7,7 +7,7 @@ import { GetFuel } from './fuel/scriptrunner.js';
 import { IncremenetTimeBy1second } from '../utils/Functions.js';
 import { GetTilt } from './tilt/scriptrunner.js';
 import chalk from 'chalk';
-import { createWorker } from 'tesseract.js';
+import { performance } from 'perf_hooks';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);

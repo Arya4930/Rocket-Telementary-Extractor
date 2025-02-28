@@ -9,9 +9,6 @@
     "fix": "node src/finalize/fix.js"
   },
   "type": "module",
-  "_moduleAliases": {
-    "@root": "src"
-  },
   "author": "",
   "license": "ISC",
   "description": "",

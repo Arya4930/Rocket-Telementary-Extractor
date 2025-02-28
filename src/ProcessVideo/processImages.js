@@ -85,7 +85,7 @@ export default async function processImages(
             !InCommingData &&
             data.time !== '00:00:00'
         ) {
-            skipcount = data - 2;
+            skipcount = data - 1;
             console.log(`Skipping the next ${skipcount} files...`);
             fs.unlinkSync(filePath);
             continue;

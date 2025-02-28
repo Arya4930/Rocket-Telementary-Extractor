@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import 'module-alias/register.js';
 import path from 'path';
 import fs from 'fs';
 import minimist from 'minimist';
