@@ -2,7 +2,7 @@ import { Worker } from 'worker_threads';
 import os from 'os';
 import path from 'path';
 
-const NUM_WORKERS = os.cpus().length;
+const NUM_WORKERS = os.cpus().length - 1;
 
 class WorkerPool {
     constructor(workerScript) {
@@ -18,7 +18,7 @@ class WorkerPool {
 
     runTask(data) {
         return new Promise((resolve, reject) => {
-            // console.log(`Queue length before task: ${this.queue.length}`);
+            console.log(`Queue length before task: ${this.queue.length}`);
             const worker = this.workers.pop();
 
             if (!worker) {
@@ -27,10 +27,10 @@ class WorkerPool {
             }
 
             this.activeworkers++;
-            // console.log(`Active workers: ${this.activeworkers}`);
+            console.log(`Active workers: ${this.activeworkers}`);
 
             worker.once('message', (result) => {
-                // console.log(`Task completed, releasing worker`);
+                console.log(`Task completed, releasing worker`);
                 resolve(result);
                 this.activeworkers--;
                 this.workers.push(worker);
@@ -65,4 +65,8 @@ export const fuelWorkerPool = new WorkerPool(
 );
 export const tiltWorkerPool = new WorkerPool(
     path.resolve('src/ProcessVideo/tilt/pythonWorker.js')
+);
+
+export const AnalyzeWorkerPool = new WorkerPool(
+    path.resolve('src/ProcessVideo/analyzeImageFromFile.js')
 );

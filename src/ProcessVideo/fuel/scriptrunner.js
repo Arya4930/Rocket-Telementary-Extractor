@@ -1,4 +1,4 @@
-import { fuelWorkerPool } from './workerpool.js';
+import { fuelWorkerPool } from '../workerpool.js';
 import { CropImagesToAnalyze } from '../../utils/Functions.js';
 
 export async function GetFuel(img) {

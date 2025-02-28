@@ -1,5 +1,5 @@
 import { CropImagesToAnalyze } from '../../utils/Functions.js';
-import { tiltWorkerPool } from '../fuel/workerpool.js';
+import { tiltWorkerPool } from '../workerpool.js';
 
 export async function GetTilt(img) {
     const regions = [
