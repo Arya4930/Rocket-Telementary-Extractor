@@ -5,6 +5,7 @@ import { isInt } from '../utils/Functions.js';
 import chalk from 'chalk';
 import CropImages from './Croplmages.js';
 import sharp from 'sharp';
+import { AnalyzeWorkerPool } from './workerpool.js';
 
 export default async function processImages(
     directoryPath,
@@ -49,7 +50,11 @@ export default async function processImages(
         );
         console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
         const start = performance.now();
-        const data = await analyzeImageFromFile(filePath, rocketType, time);
+        const data = await AnalyzeWorkerPool.runTask({
+            imagePath: filePath,
+            rocketType,
+            Temptime: time
+        });
         const end = performance.now();
         console.log(
             chalk.yellow.bold(
