@@ -15,6 +15,7 @@ export default async function processImages(
     const files = fs
         .readdirSync(directoryPath)
         .filter((file) => /^frame_\d{5}\.png$/.test(file));
+
     let skipcount = 0;
     let InCommingData = false;
     let firstTimeData = false;
@@ -29,8 +30,11 @@ export default async function processImages(
 
     fs.writeFileSync(outputFilePath, '[\n');
 
+    let results = [];
+
     for (const file of files) {
         const filePath = path.join(directoryPath, file);
+
         if (skipcount > 0) {
             skipcount--;
             try {
@@ -43,11 +47,7 @@ export default async function processImages(
             }
             continue;
         }
-        console.log(
-            chalk.blue(
-                '==========================================================='
-            )
-        );
+
         console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
         const start = performance.now();
         const data = await AnalyzeWorkerPool.runTask({
@@ -81,10 +81,11 @@ export default async function processImages(
             if (timeCtr > 20) {
                 console.log(`Skipping Next 60 files as all values are 0`);
                 skipcount = 60;
-                continue;
             }
             continue;
-        } else if (
+        }
+
+        if (
             typeof data === 'number' &&
             isInt(data) &&
             !InCommingData &&
@@ -98,34 +99,32 @@ export default async function processImages(
 
         time = data.time;
         if (values.every((val) => val === 0)) {
-            // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
             timeCtr++;
             fs.unlinkSync(filePath);
             if (timeCtr > 20) {
-                console.log(`skipping Next 60 files as all values are 0`);
+                console.log(`Skipping Next 60 files as all values are 0`);
                 skipcount = 60;
                 InCommingData = false;
-                continue;
             }
-            fs.appendFileSync(
-                outputFilePath,
-                JSON.stringify({ file: file, ...data }, null, 2) + ',\n'
-            );
             continue;
         }
-        fs.appendFileSync(
-            outputFilePath,
-            JSON.stringify({ file: file, ...data }, null, 2) + ',\n'
-        );
+
         InCommingData = true;
-        // resetting the time counter
         timeCtr = 0;
+
+        results.push({ file, ...data });
+
         if (!firstTimeData) {
             await CropImages(directoryPath);
             firstTimeData = true;
         }
     }
 
-    fs.appendFileSync(outputFilePath, ']\n');
+    // Write results at once
+    fs.appendFileSync(
+        outputFilePath,
+        results.map((r) => JSON.stringify(r, null, 2)).join(',\n') + '\n]\n'
+    );
+
     console.log(`Results saved to ${outputFilePath}`);
 }
