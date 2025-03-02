@@ -20,31 +20,31 @@ class Vehicles {
         const seconds = parseInt(timeParts[2], 10);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
         if (!InCommingData) {
-            if (words[0].text !== 'SPEED') {
+            if (words[0] !== 'SPEED') {
                 words.shift();
             }
-            this.booster_speed = parseInt(words[1].text) || 0;
+            this.booster_speed = parseInt(words[1]) || 0;
             for (let i = 0; i < words.length; i++) {
-                if (words[i].text === 'ALTITUDE' && words[i + 1]) {
-                    this.booster_altitude = words[i + 1].text;
+                if (words[i] === 'ALTITUDE' && words[i + 1]) {
+                    this.booster_altitude = words[i + 1];
                     break;
                 }
             }
             for (let i = 0; i < words.length; i++) {
-                if (words[i].text === 'ALTITUDE' && words[i + 1]) {
-                    this.ship_altitude = words[i + 1].text;
+                if (words[i] === 'ALTITUDE' && words[i + 1]) {
+                    this.ship_altitude = words[i + 1];
                 }
             }
             for (let i = 0; i < words.length; i++) {
-                if (words[i].text === 'SPEED' && words[i + 1]) {
-                    this.ship_speed = words[i + 1].text;
+                if (words[i] === 'SPEED' && words[i + 1]) {
+                    this.ship_speed = words[i + 1];
                 }
             }
         } else {
-            this.booster_speed = words[0];
-            this.booster_altitude = words[1];
-            this.ship_speed = words[2];
-            this.ship_altitude = words[3];
+            this.booster_speed = words[0] ? words[0] : 0;
+            this.booster_altitude = words[1] ? words[1] : 0;
+            this.ship_speed = words[2] ? words[2] : 0;
+            this.ship_altitude = words[3] ? words[3] : 0;
         }
 
         this.boosterloxPercent = parseFloat(
@@ -62,6 +62,10 @@ class Vehicles {
             this.shiploxPercent = 97.0;
             this.shipch4Percent = 94.0;
         } else {
+            if (totalSeconds > 420) {
+                this.ship_speed = words[0] ? words[0] : 0;
+                this.ship_altitude = words[1] ? words[1] : 0;
+            }
             this.shiploxPercent = parseFloat(
                 parseFloat(Fuel[2]).toFixed(2) - 0.42
             );

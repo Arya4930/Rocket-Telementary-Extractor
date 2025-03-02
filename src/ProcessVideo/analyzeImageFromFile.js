@@ -2,6 +2,7 @@ import fs from 'fs';
 import CreateClient from '@azure-rest/ai-vision-image-analysis';
 const createClient = CreateClient.default;
 import { AzureKeyCredential } from '@azure/core-auth';
+import { createWorker } from 'tesseract.js';
 import Vehicles from './vehicles.js';
 import { GetFuel } from './fuel/scriptrunner.js';
 import {
@@ -18,7 +19,7 @@ const vehicleInstances = new Vehicles();
 
 const features = ['Read'];
 
-async function getWordsFromImage(imagePath) {
+async function getWordsFromAzure(imagePath) {
     const imageData = fs.readFileSync(imagePath);
     const result = await client.path('/imageanalysis:analyze').post({
         body: imageData,
@@ -34,13 +35,29 @@ async function getWordsFromImage(imagePath) {
     if (iaResult.readResult && iaResult.readResult.blocks) {
         const words = iaResult.readResult.blocks.flatMap((block) =>
             block.lines.flatMap((line) =>
-                line.words.map((word) => ({
-                    text: word.text,
-                    boundingPolygon: word.boundingPolygon
-                }))
+                line.words.map((word) => word.text.trim())
             )
         );
         return words ? words : 0;
+    }
+}
+
+export async function getWordsFromTesseract(imagePath) {
+    try {
+        const imageData = fs.readFileSync(imagePath);
+        const worker = await createWorker('eng');
+        const ret = await worker.recognize(imageData);
+        await worker.terminate();
+
+        const words = ret.data.text
+            .trim()
+            .split('\n')
+            .map((word) => (word == '[1]' ? '0' : word))
+            .filter((value) => /^\d+$/.test(value));
+        return words;
+    } catch (err) {
+        console.error(`Error reading image with Tesseract: ${err.message}`);
+        return 0;
     }
 }
 
@@ -52,9 +69,11 @@ export default async function analyzeImageFromFile(
 ) {
     try {
         let words;
+        let Fuel = new Array(4).fill(null);
+        let Tilt = new Array(2).fill(null);
         let time = null;
         if (!InCommingData && !Temptime) {
-            words = await getWordsFromImage(imagePath);
+            words = await getWordsFromAzure(imagePath);
             const patterns = [
                 {
                     regex: /^T\+\d{2}:\d{2}:\d{2}$/,
@@ -93,16 +112,16 @@ export default async function analyzeImageFromFile(
             let plustime;
 
             for (const word of words) {
-                if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word.text)) {
-                    const t = word.text
+                if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word)) {
+                    const t = word
                         .substring(2)
                         .split(':')
                         .map((e) => Number(e));
                     plustime = t[0] * 3600 + t[1] * 60 + t[2];
                 } else {
                     for (const { regex, transform } of patterns) {
-                        if (regex.test(word.text)) {
-                            time = transform(word.text);
+                        if (regex.test(word)) {
+                            time = transform(word);
                         }
                     }
                 }
@@ -133,37 +152,21 @@ export default async function analyzeImageFromFile(
                 ];
 
                 const fileNames = await CropImagesToAnalyze(imagePath, regions);
-                words = (
-                    await Promise.all(
-                        fileNames.map((file) => getWordsFromImage(file))
-                    )
-                )
-                    .flat()
-                    .map((item) => item.text);
+                [words, Fuel, Tilt] = await Promise.all([
+                    Promise.all(
+                        fileNames.map((file) =>
+                            Promise.race([
+                                getWordsFromAzure(file),
+                                getWordsFromTesseract(file)
+                            ])
+                        )
+                    ).then((res) => res.flat()),
+
+                    GetFuel(imagePath),
+                    GetTilt(imagePath)
+                ]);
                 fileNames.map((file) => fs.unlinkSync(file));
-                const ImageReadEnd = performance.now();
-                console.log(
-                    chalk.yellow.bold(
-                        `Time taken to Text Data off Frame: ${((ImageReadEnd - ImageReadStart) / 1000).toFixed(2)}s.`
-                    )
-                );
             }
-            const Fuelstart = performance.now();
-            const Fuel = await GetFuel(imagePath);
-            const Fuelend = performance.now();
-            console.log(
-                chalk.yellow.bold(
-                    `Time taken to Get Fuel Data: ${((Fuelend - Fuelstart) / 1000).toFixed(2)}s.`
-                )
-            );
-            const Tiltstart = performance.now();
-            const Tilt = await GetTilt(imagePath);
-            const Tiltend = performance.now();
-            console.log(
-                chalk.yellow.bold(
-                    `Time taken to Get Tilt Data: ${((Tiltend - Tiltstart) / 1000).toFixed(2)}s.`
-                )
-            );
             return vehicleInstances.starship(
                 words,
                 time,
