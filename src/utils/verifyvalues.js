@@ -126,10 +126,7 @@ export async function VerifyFuel(jsonData, rowIndex, type) {
 }
 
 export async function VerifyTilt(jsonData, rowIndex, type) {
-    const fuel_type = {
-        B: 'booster_tilt',
-        S: 'ship_Tilt'
-    };
+    const fuel_type = type == 'B' ? 'booster_tilt' : 'ship_Tilt';
 
     let verifyTilt = jsonData[rowIndex][fuel_type];
     let offset = 1;

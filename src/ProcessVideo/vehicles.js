@@ -9,8 +9,8 @@ class Vehicles {
         this.boosterch4Percent = 100.0;
         this.shiploxPercent = 97.0;
         this.shipch4Percent = 95.0;
-        this.boosterTilt = 0.0;
-        this.shipTilt = 0.0;
+        this.boosterTilt = 90.0;
+        this.shipTilt = 90.0;
     }
 
     starship(words, time, Fuel, Tilt) {

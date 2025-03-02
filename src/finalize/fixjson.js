@@ -59,7 +59,7 @@ export async function fixjson(jsonData, sheet) {
                 rowIndex,
                 'B'
             );
-            jsonData[rowIndex].ship_tilt = await VerifyTilt(
+            jsonData[rowIndex].ship_Tilt = await VerifyTilt(
                 jsonData,
                 rowIndex,
                 'S'

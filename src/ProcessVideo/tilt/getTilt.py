@@ -13,7 +13,7 @@ if image is None:
     print(f"Error: Unable to load image {image_path}. Check the file path.")
     sys.exit(1)
 
-mask = np.all(image > [135, 135, 135], axis=-1)
+mask = np.all(image > [125, 125, 125], axis=-1)
 coordinates = np.column_stack(np.where(mask))
 
 if coordinates.size == 0:
@@ -27,7 +27,8 @@ if len(x_coords) > 1 and len(y_coords) > 1:
     cov_matrix = np.cov(x_coords, y_coords)
     eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
     angles = np.degrees(np.arctan2(eigenvectors[1, :], eigenvectors[0, :]))
-    print(angles[0] + 180)
+    angles = np.mod(angles, 180) 
+    print(angles[1])
 else:
     print(0)
     sys.exit(1)
