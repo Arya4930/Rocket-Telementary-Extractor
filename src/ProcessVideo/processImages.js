@@ -52,7 +52,12 @@ export default async function processImages(
         );
         console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
         const start = performance.now();
-        const data = await analyzeImageFromFile(filePath, rocketType, time);
+        const data = await analyzeImageFromFile(
+            filePath,
+            rocketType,
+            time,
+            InCommingData
+        );
         // const data = await AnalyzeWorkerPool.runTask({
         //     imagePath: filePath,
         //     rocketType,

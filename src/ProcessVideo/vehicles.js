@@ -13,24 +13,40 @@ class Vehicles {
         this.shipTilt = 90.0;
     }
 
-    starship(words, time, Fuel, Tilt) {
-        if (words[0].text !== 'SPEED') {
-            words.shift();
-        }
-        this.booster_speed = parseInt(words[1].text) || 0;
-
+    starship(words, time, Fuel, Tilt, InCommingData) {
         const timeParts = time.split(':');
         const hours = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
         const seconds = parseInt(timeParts[2], 10);
         const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-
-        for (let i = 0; i < words.length; i++) {
-            if (words[i].text === 'ALTITUDE' && words[i + 1]) {
-                this.booster_altitude = words[i + 1].text;
-                break;
+        if (!InCommingData) {
+            if (words[0].text !== 'SPEED') {
+                words.shift();
             }
+            this.booster_speed = parseInt(words[1].text) || 0;
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].text === 'ALTITUDE' && words[i + 1]) {
+                    this.booster_altitude = words[i + 1].text;
+                    break;
+                }
+            }
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].text === 'ALTITUDE' && words[i + 1]) {
+                    this.ship_altitude = words[i + 1].text;
+                }
+            }
+            for (let i = 0; i < words.length; i++) {
+                if (words[i].text === 'SPEED' && words[i + 1]) {
+                    this.ship_speed = words[i + 1].text;
+                }
+            }
+        } else {
+            this.booster_speed = words[0];
+            this.booster_altitude = words[1];
+            this.ship_speed = words[2];
+            this.ship_altitude = words[3];
         }
+
         this.boosterloxPercent = parseFloat(
             parseFloat(Fuel[0]).toFixed(2) + 0.42
         );
@@ -53,16 +69,6 @@ class Vehicles {
                 parseFloat(Fuel[3]).toFixed(2) - 0.42
             );
             this.shipTilt = parseFloat(Tilt[1]).toFixed(2);
-            for (let i = 0; i < words.length; i++) {
-                if (words[i].text === 'ALTITUDE' && words[i + 1]) {
-                    this.ship_altitude = words[i + 1].text;
-                }
-            }
-            for (let i = 0; i < words.length; i++) {
-                if (words[i].text === 'SPEED' && words[i + 1]) {
-                    this.ship_speed = words[i + 1].text;
-                }
-            }
         }
 
         const telemetryData = {
@@ -89,111 +95,111 @@ class Vehicles {
         // code
     }
 
-    new_glenn(words, time) {
-        const timeParts = time.split(':');
-        const hours = parseInt(timeParts[0], 10);
-        const minutes = parseInt(timeParts[1], 10);
-        const seconds = parseInt(timeParts[2], 10);
-        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    // new_glenn(words, time) {
+    //     const timeParts = time.split(':');
+    //     const hours = parseInt(timeParts[0], 10);
+    //     const minutes = parseInt(timeParts[1], 10);
+    //     const seconds = parseInt(timeParts[2], 10);
+    //     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
-        for (let i = 0; i < words.length; i++) {
-            if (
-                words[i].boundingPolygon[0]['x'] > 237 &&
-                words[i].boundingPolygon[0]['y'] > 977 &&
-                words[i].boundingPolygon[1]['x'] < 400 &&
-                words[i].boundingPolygon[1]['y'] < 1000
-            ) {
-                this.booster_speed =
-                    Math.round(
-                        convert(parseInt(words[i].text.replace(',', '')))
-                            .from('mi')
-                            .to('km') * 100
-                    ) / 100;
-            }
-            if (
-                words[i].boundingPolygon[0]['x'] > 560 &&
-                words[i].boundingPolygon[0]['y'] > 980 &&
-                words[i].boundingPolygon[1]['x'] < 720 &&
-                words[i].boundingPolygon[1]['y'] < 1000
-            ) {
-                this.booster_altitude = parseInt(
-                    words[i].text.replace(',', '')
-                );
-            }
-        }
+    //     for (let i = 0; i < words.length; i++) {
+    //         if (
+    //             words[i].boundingPolygon[0]['x'] > 237 &&
+    //             words[i].boundingPolygon[0]['y'] > 977 &&
+    //             words[i].boundingPolygon[1]['x'] < 400 &&
+    //             words[i].boundingPolygon[1]['y'] < 1000
+    //         ) {
+    //             this.booster_speed =
+    //                 Math.round(
+    //                     convert(parseInt(words[i].text.replace(',', '')))
+    //                         .from('mi')
+    //                         .to('km') * 100
+    //                 ) / 100;
+    //         }
+    //         if (
+    //             words[i].boundingPolygon[0]['x'] > 560 &&
+    //             words[i].boundingPolygon[0]['y'] > 980 &&
+    //             words[i].boundingPolygon[1]['x'] < 720 &&
+    //             words[i].boundingPolygon[1]['y'] < 1000
+    //         ) {
+    //             this.booster_altitude = parseInt(
+    //                 words[i].text.replace(',', '')
+    //             );
+    //         }
+    //     }
 
-        if (totalSeconds <= 194) {
-            this.ship_altitude = this.booster_altitude;
-            this.ship_speed = this.booster_speed;
-        } else {
-            for (let i = 0; i < words.length; i++) {
-                if (
-                    words[i].boundingPolygon[0]['x'] > 1240 &&
-                    words[i].boundingPolygon[0]['y'] > 980 &&
-                    words[i].boundingPolygon[1]['x'] < 1400 &&
-                    words[i].boundingPolygon[1]['y'] < 990
-                ) {
-                    this.ship_speed =
-                        Math.round(
-                            convert(parseInt(words[i].text.replace(',', '')))
-                                .from('mi')
-                                .to('km') * 100
-                        ) / 100;
-                }
-                if (
-                    words[i].boundingPolygon[0]['x'] > 1548 &&
-                    words[i].boundingPolygon[0]['y'] > 980 &&
-                    words[i].boundingPolygon[1]['x'] < 1710 &&
-                    words[i].boundingPolygon[1]['y'] < 995
-                ) {
-                    this.ship_altitude = parseInt(
-                        words[i].text.replace(',', '')
-                    );
-                }
-            }
-        }
+    //     if (totalSeconds <= 194) {
+    //         this.ship_altitude = this.booster_altitude;
+    //         this.ship_speed = this.booster_speed;
+    //     } else {
+    //         for (let i = 0; i < words.length; i++) {
+    //             if (
+    //                 words[i].boundingPolygon[0]['x'] > 1240 &&
+    //                 words[i].boundingPolygon[0]['y'] > 980 &&
+    //                 words[i].boundingPolygon[1]['x'] < 1400 &&
+    //                 words[i].boundingPolygon[1]['y'] < 990
+    //             ) {
+    //                 this.ship_speed =
+    //                     Math.round(
+    //                         convert(parseInt(words[i].text.replace(',', '')))
+    //                             .from('mi')
+    //                             .to('km') * 100
+    //                     ) / 100;
+    //             }
+    //             if (
+    //                 words[i].boundingPolygon[0]['x'] > 1548 &&
+    //                 words[i].boundingPolygon[0]['y'] > 980 &&
+    //                 words[i].boundingPolygon[1]['x'] < 1710 &&
+    //                 words[i].boundingPolygon[1]['y'] < 995
+    //             ) {
+    //                 this.ship_altitude = parseInt(
+    //                     words[i].text.replace(',', '')
+    //                 );
+    //             }
+    //         }
+    //     }
 
-        if (totalSeconds > 407) {
-            this.booster_altitude =
-                Math.round(
-                    convert(this.booster_altitude).from('ft').to('km') * 100
-                ) / 100;
-            this.ship_altitude =
-                Math.round(
-                    convert(this.ship_altitude).from('mi').to('km') * 100
-                ) / 100;
-        } else if (totalSeconds > 218) {
-            this.booster_altitude =
-                Math.round(
-                    convert(this.booster_altitude).from('mi').to('km') * 100
-                ) / 100;
-            this.ship_altitude =
-                Math.round(
-                    convert(this.ship_altitude).from('mi').to('km') * 100
-                ) / 100;
-        } else {
-            this.booster_altitude =
-                Math.round(
-                    convert(this.booster_altitude).from('ft').to('km') * 100
-                ) / 100;
-            this.ship_altitude =
-                Math.round(
-                    convert(this.ship_altitude).from('ft').to('km') * 100
-                ) / 100;
-        }
-        const telemetryData = {
-            time: time || 'Not found',
-            ship_speed: parseFloat(this.ship_speed) || 0,
-            ship_altitude: parseFloat(this.ship_altitude) || 0,
-            ...(totalSeconds <= 480 && {
-                booster_speed: parseFloat(this.booster_speed) || 0,
-                booster_altitude: parseFloat(this.booster_altitude) || 0
-            })
-        };
+    //     if (totalSeconds > 407) {
+    //         this.booster_altitude =
+    //             Math.round(
+    //                 convert(this.booster_altitude).from('ft').to('km') * 100
+    //             ) / 100;
+    //         this.ship_altitude =
+    //             Math.round(
+    //                 convert(this.ship_altitude).from('mi').to('km') * 100
+    //             ) / 100;
+    //     } else if (totalSeconds > 218) {
+    //         this.booster_altitude =
+    //             Math.round(
+    //                 convert(this.booster_altitude).from('mi').to('km') * 100
+    //             ) / 100;
+    //         this.ship_altitude =
+    //             Math.round(
+    //                 convert(this.ship_altitude).from('mi').to('km') * 100
+    //             ) / 100;
+    //     } else {
+    //         this.booster_altitude =
+    //             Math.round(
+    //                 convert(this.booster_altitude).from('ft').to('km') * 100
+    //             ) / 100;
+    //         this.ship_altitude =
+    //             Math.round(
+    //                 convert(this.ship_altitude).from('ft').to('km') * 100
+    //             ) / 100;
+    //     }
+    //     const telemetryData = {
+    //         time: time || 'Not found',
+    //         ship_speed: parseFloat(this.ship_speed) || 0,
+    //         ship_altitude: parseFloat(this.ship_altitude) || 0,
+    //         ...(totalSeconds <= 480 && {
+    //             booster_speed: parseFloat(this.booster_speed) || 0,
+    //             booster_altitude: parseFloat(this.booster_altitude) || 0
+    //         })
+    //     };
 
-        console.log(telemetryData);
-        return telemetryData;
-    }
+    //     console.log(telemetryData);
+    //     return telemetryData;
+    // }
 }
 
 export default Vehicles;
