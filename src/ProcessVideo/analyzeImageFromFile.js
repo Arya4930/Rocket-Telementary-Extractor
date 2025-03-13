@@ -10,8 +10,6 @@ import {
     IncremenetTimeBy1second
 } from '../utils/Functions.js';
 import { GetTilt } from './tilt/scriptrunner.js';
-import chalk from 'chalk';
-import { performance } from 'perf_hooks';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -20,46 +18,56 @@ const vehicleInstances = new Vehicles();
 const features = ['Read'];
 
 async function getWordsFromAzure(imagePath) {
-    const imageData = fs.readFileSync(imagePath);
-    const result = await client.path('/imageanalysis:analyze').post({
-        body: imageData,
-        queryParameters: {
-            features: features
-        },
-        headers: {
-            'Content-Type': 'application/octet-stream'
-        }
-    });
+    try {
+        const imageData = fs.readFileSync(imagePath);
+        const result = await client.path('/imageanalysis:analyze').post({
+            body: imageData,
+            queryParameters: {
+                features: features
+            },
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        });
 
-    const iaResult = result.body;
-    if (iaResult.readResult && iaResult.readResult.blocks) {
-        const words = iaResult.readResult.blocks.flatMap((block) =>
-            block.lines.flatMap((line) =>
-                line.words.map((word) => word.text.trim())
-            )
-        );
-        return words ? words : 0;
+        const iaResult = result.body;
+        if (iaResult.readResult && iaResult.readResult.blocks) {
+            const words = iaResult.readResult.blocks.flatMap((block) =>
+                block.lines.flatMap((line) =>
+                    line.words.map((word) => word.text.trim())
+                )
+            );
+            return words ? words : 0;
+        }
+    } catch (err) {
+        console.error(`Error reading image with Azure: ${err}`);
+        return 0;
     }
 }
 
-export async function getWordsFromTesseract(imagePath) {
+export async function getWordsFromTesseract(imagePath, filter = false) {
     try {
         const imageData = fs.readFileSync(imagePath);
         const worker = await createWorker('eng');
         const ret = await worker.recognize(imageData);
         await worker.terminate();
 
-        const words = ret.data.text
+        let words = ret.data.text
             .trim()
             .split('\n')
-            .map((word) => (word == '[1]' ? '0' : word))
-            .filter((value) => /^\d+$/.test(value));
+            .map((word) => (word == '[1]' ? '0' : word));
+
+        if (filter) {
+            words = words.filter((value) => /^\d+$/.test(value));
+        }
         return words;
     } catch (err) {
         console.error(`Error reading image with Tesseract: ${err.message}`);
         return 0;
     }
 }
+
+let isPlusTime = false;
 
 export default async function analyzeImageFromFile(
     imagePath,
@@ -73,7 +81,16 @@ export default async function analyzeImageFromFile(
         let Tilt = new Array(2).fill(null);
         let time = null;
         if (!InCommingData && !Temptime) {
-            words = await getWordsFromAzure(imagePath);
+            if (isPlusTime) {
+                words = await getWordsFromAzure(imagePath);
+            } else {
+                words = await Promise.race([
+                    getWordsFromAzure(imagePath),
+                    getWordsFromTesseract(imagePath)
+                ]).then((res) => res.flat());
+            }
+            console.log(words);
+
             const patterns = [
                 {
                     regex: /^T\+\d{2}:\d{2}:\d{2}$/,
@@ -109,31 +126,35 @@ export default async function analyzeImageFromFile(
                 }
             ];
 
-            let plustime;
+            let plustime = 0;
 
             for (const word of words) {
-                if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(word)) {
-                    const t = word
-                        .substring(2)
-                        .split(':')
-                        .map((e) => Number(e));
-                    plustime = t[0] * 3600 + t[1] * 60 + t[2];
-                } else {
-                    for (const { regex, transform } of patterns) {
-                        if (regex.test(word)) {
-                            time = transform(word);
+                const SeperatedWords = word.split(` `);
+                for (const SeperatedWord of SeperatedWords) {
+                    if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(SeperatedWord)) {
+                        const t = SeperatedWord.substring(2)
+                            .split(':')
+                            .map((e) => Number(e));
+                        plustime = t[0] * 3600 + t[1] * 60 + t[2];
+                    } else {
+                        for (const { regex, transform } of patterns) {
+                            if (regex.test(SeperatedWord)) {
+                                time = transform(SeperatedWord);
+                            }
                         }
                     }
                 }
             }
-            if (plustime) return plustime;
+            if (plustime) {
+                isPlusTime = true;
+                return plustime;
+            }
             if (!time) return;
         }
 
         if (rocketType === 'Starship') {
             if (Temptime) time = IncremenetTimeBy1second(Temptime);
             if (InCommingData) {
-                const ImageReadStart = performance.now();
                 const regions = [
                     {
                         name: 'boosterStats',
@@ -156,8 +177,8 @@ export default async function analyzeImageFromFile(
                     Promise.all(
                         fileNames.map((file) =>
                             Promise.race([
-                                getWordsFromAzure(file),
-                                getWordsFromTesseract(file)
+                                getWordsFromAzure(file)
+                                // getWordsFromTesseract(file, true)
                             ])
                         )
                     ).then((res) => res.flat()),
@@ -167,6 +188,7 @@ export default async function analyzeImageFromFile(
                 ]);
                 fileNames.map((file) => fs.unlinkSync(file));
             }
+            if (words == 0) return;
             return vehicleInstances.starship(
                 words,
                 time,

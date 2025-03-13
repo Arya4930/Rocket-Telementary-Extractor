@@ -26,6 +26,6 @@ for x in range(len(image[0])):
             break
 
 if first_target_point:
-    print(first_target_point * 100 / 238)
+    print((first_target_point) * 100 / 238)
 else:
     print("No matching point found.")

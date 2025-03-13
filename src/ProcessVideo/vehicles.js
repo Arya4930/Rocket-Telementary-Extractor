@@ -55,7 +55,7 @@ class Vehicles {
         );
         this.boosterTilt = parseFloat(Tilt[0]).toFixed(2);
 
-        if (totalSeconds < 150) {
+        if (totalSeconds <= 160) {
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
             this.shipTilt = this.boosterTilt;
@@ -63,8 +63,11 @@ class Vehicles {
             this.shipch4Percent = 94.0;
         } else {
             if (totalSeconds > 420) {
-                this.ship_speed = words[0] ? words[0] : 0;
-                this.ship_altitude = words[1] ? words[1] : 0;
+                if (words.length == 4) {
+                } else if (words.length == 2) {
+                    this.ship_speed = words[0] ? words[0] : 0;
+                    this.ship_altitude = words[1] ? words[1] : 0;
+                }
             }
             this.shiploxPercent = parseFloat(
                 parseFloat(Fuel[2]).toFixed(2) - 0.42

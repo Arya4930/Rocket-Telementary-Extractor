@@ -6,6 +6,7 @@ import CropImages from './Croplmages.js';
 import sharp from 'sharp';
 // import { AnalyzeWorkerPool } from './workerpool.js';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
+import { saveLatestFrame } from '../utils/Functions.js';
 
 export default async function processImages(
     directoryPath,
@@ -52,6 +53,7 @@ export default async function processImages(
         );
         console.log(chalk.green.bold(`Processing: ${path.basename(filePath)}`));
         const start = performance.now();
+        await saveLatestFrame(filePath, directoryPath);
         const data = await analyzeImageFromFile(
             filePath,
             rocketType,
@@ -105,7 +107,7 @@ export default async function processImages(
         }
 
         time = data.time;
-        if (values.every((val) => val === 0)) {
+        if (values.every((val) => val === 0 || val === NaN)) {
             // if a lot of values are comming as 0 than start counting them and if they are more than 10 than skip the next 10 files
             timeCtr++;
             fs.unlinkSync(filePath);
@@ -133,6 +135,8 @@ export default async function processImages(
             firstTimeData = true;
         }
     }
-    fs.appendFileSync(outputFilePath, ']\n');
+    let outputData = fs.readFileSync(outputFilePath, 'utf8');
+    outputData = outputData.replace(/,\s*$/, '');
+    fs.writeFileSync(outputFilePath, outputData + '\n]\n');
     console.log(`Results saved to ${outputFilePath}`);
 }

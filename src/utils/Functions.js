@@ -46,3 +46,8 @@ export async function CropImagesToAnalyze(img, regions) {
         console.error(`Error in image processing: ${err.message}`);
     }
 }
+
+export async function saveLatestFrame(filePath, directoryPath) {
+    const latestPath = path.join(directoryPath, 'latest.png');
+    fs.copyFileSync(filePath, latestPath);
+}
