@@ -66,6 +66,9 @@ export const fuelWorkerPool = new WorkerPool(
 export const tiltWorkerPool = new WorkerPool(
     path.resolve('src/ProcessVideo/tilt/pythonWorker.js')
 );
+export const EngineWorkerPool = new WorkerPool(
+    path.resolve('src/ProcessVideo/engines/pythonWorker.js')
+);
 
 // export const AnalyzeWorkerPool = new WorkerPool(
 //     path.resolve('src/ProcessVideo/jsworker.js')

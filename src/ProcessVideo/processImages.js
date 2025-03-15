@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { isInt } from '../utils/Functions.js';
 import chalk from 'chalk';
-import CropImages from './Croplmages.js';
+import CropImages from '../utils/Croplmages.js';
 import sharp from 'sharp';
 // import { AnalyzeWorkerPool } from './workerpool.js';
 import analyzeImageFromFile from './analyzeImageFromFile.js';

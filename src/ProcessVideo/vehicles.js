@@ -11,9 +11,11 @@ class Vehicles {
         this.shipch4Percent = 95.0;
         this.boosterTilt = 90.0;
         this.shipTilt = 90.0;
+        this.boosterEngines = 0;
+        this.shipEngines = 0;
     }
 
-    starship(words, time, Fuel, Tilt, InCommingData) {
+    starship(words, time, Fuel, Tilt, Engines, InCommingData) {
         const timeParts = time.split(':');
         const hours = parseInt(timeParts[0], 10);
         const minutes = parseInt(timeParts[1], 10);
@@ -54,13 +56,15 @@ class Vehicles {
             parseFloat(Fuel[1]).toFixed(2) + 0.42
         );
         this.boosterTilt = parseFloat(Tilt[0]).toFixed(2);
+        this.boosterEngines = Engines[0];
 
         if (totalSeconds <= 160) {
             this.ship_altitude = this.booster_altitude;
             this.ship_speed = this.booster_speed;
             this.shipTilt = this.boosterTilt;
             this.shiploxPercent = 97.0;
-            this.shipch4Percent = 94.0;
+            this.shipch4Percent = 95.0;
+            this.shiploxPercent = 0;
         } else {
             if (totalSeconds > 420) {
                 if (words.length == 4) {
@@ -69,6 +73,7 @@ class Vehicles {
                     this.ship_altitude = words[1] ? words[1] : 0;
                 }
             }
+            this.shipEngines = Engines[1];
             this.shiploxPercent = parseFloat(
                 parseFloat(Fuel[2]).toFixed(2) - 0.42
             );
@@ -85,12 +90,14 @@ class Vehicles {
             ship_LOX_Percent: this.shiploxPercent,
             ship_CH4_Percent: this.shipch4Percent,
             ship_Tilt: parseFloat(this.shipTilt),
+            ship_engines: parseInt(this.shipEngines),
             ...(totalSeconds <= 420 && {
                 booster_speed: parseInt(this.booster_speed) || 0,
                 booster_altitude: parseInt(this.booster_altitude) || 0,
                 booster_LOX_Percent: this.boosterloxPercent,
                 booster_CH4_Percent: this.boosterch4Percent,
-                booster_tilt: parseFloat(this.boosterTilt)
+                booster_tilt: parseFloat(this.boosterTilt),
+                booster_engines: parseInt(this.boosterEngines)
             })
         };
 

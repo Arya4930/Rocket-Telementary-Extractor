@@ -10,6 +10,7 @@ import {
     IncremenetTimeBy1second
 } from '../utils/Functions.js';
 import { GetTilt } from './tilt/scriptrunner.js';
+import { GetEngines } from './engines/srciptrunner.js';
 
 const credential = new AzureKeyCredential(process.env.VISION_KEY);
 const client = createClient(process.env.VISION_ENDPOINT, credential);
@@ -79,6 +80,7 @@ export default async function analyzeImageFromFile(
         let words;
         let Fuel = new Array(4).fill(null);
         let Tilt = new Array(2).fill(null);
+        let Engines = new Array(2).fill(null);
         let time = null;
         if (!InCommingData && !Temptime) {
             if (isPlusTime) {
@@ -89,8 +91,6 @@ export default async function analyzeImageFromFile(
                     getWordsFromTesseract(imagePath)
                 ]).then((res) => res.flat());
             }
-            console.log(words);
-
             const patterns = [
                 {
                     regex: /^T\+\d{2}:\d{2}:\d{2}$/,
@@ -173,7 +173,7 @@ export default async function analyzeImageFromFile(
                 ];
 
                 const fileNames = await CropImagesToAnalyze(imagePath, regions);
-                [words, Fuel, Tilt] = await Promise.all([
+                [words, Fuel, Tilt, Engines] = await Promise.all([
                     Promise.all(
                         fileNames.map((file) =>
                             Promise.race([
@@ -184,7 +184,8 @@ export default async function analyzeImageFromFile(
                     ).then((res) => res.flat()),
 
                     GetFuel(imagePath),
-                    GetTilt(imagePath)
+                    GetTilt(imagePath),
+                    GetEngines(imagePath)
                 ]);
                 fileNames.map((file) => fs.unlinkSync(file));
             }
@@ -194,6 +195,7 @@ export default async function analyzeImageFromFile(
                 time,
                 Fuel,
                 Tilt,
+                Engines,
                 InCommingData
             );
         } else if (rocketType === 'new_glenn') {
