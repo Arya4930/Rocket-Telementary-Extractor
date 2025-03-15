@@ -17,8 +17,8 @@ if img is None:
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 gray_blurred = cv2.GaussianBlur(gray, (5, 5), 0)
 detected_circles = cv2.HoughCircles(
-    gray_blurred, cv2.HOUGH_GRADIENT, dp=1.2, minDist=20,
-    param1=50, param2=30, minRadius=5, maxRadius=40
+    gray_blurred, cv2.HOUGH_GRADIENT, dp=1.2, minDist=18,
+    param1=40, param2=25, minRadius=4, maxRadius=42
 )
 
 on_engine_count = 0
