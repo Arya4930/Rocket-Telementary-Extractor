@@ -45,6 +45,7 @@ export default async function processImages(
             .extract({ left: 854, top: 55, width: 216, height: 46 })
             .toFile(outputPath);
         time = (await getWordsFromTesseract(outputPath))[0].substring(2);
+        fs.unlinkSync(outputPath);
     }
 
     fs.writeFileSync(outputFilePath, '[\n');
