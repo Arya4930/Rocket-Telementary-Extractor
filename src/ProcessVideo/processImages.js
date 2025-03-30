@@ -7,6 +7,10 @@ import sharp from 'sharp';
 // import { AnalyzeWorkerPool } from './workerpool.js';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
 import { saveLatestFrame } from '../utils/Functions.js';
+import {
+    getWordsFromAzure,
+    getWordsFromTesseract
+} from '../ProcessVideo/analyzeImageFromFile.js';
 
 export default async function processImages(
     directoryPath,
@@ -45,6 +49,15 @@ export default async function processImages(
         MergedImagemetadata = await sharp(checkFile).metadata();
         if (MergedImagemetadata.height === 950) {
             mergedFiles = true;
+            InCommingData = true;
+            firstTimeData = true;
+            const outputPath = path.join(directoryPath, `getTime.png`);
+            await sharp(path.join(directoryPath, MergedFiles[0]))
+                .extract({ left: 854, top: 55, width: 216, height: 46 })
+                .toFile(outputPath);
+
+            const words = await getWordsFromTesseract(outputPath);
+            time = words[0].substring(2);
         }
     }
 
@@ -231,7 +244,7 @@ export default async function processImages(
             typeof data === 'number' &&
             isInt(data) &&
             !InCommingData &&
-            data.time !== '00:00:00'
+            data[0].time !== '00:00:00'
         ) {
             skipcount = data - 1;
             console.log(`Skipping the next ${skipcount} files...`);
@@ -252,14 +265,16 @@ export default async function processImages(
             }
             fs.appendFileSync(
                 outputFilePath,
-                JSON.stringify({ ...data }, null, 2) + ',\n'
+                JSON.stringify(data.flat(), null, 2) + ',\n'
             );
             continue;
         }
-        fs.appendFileSync(
-            outputFilePath,
-            JSON.stringify({ ...data }, null, 2) + ',\n'
-        );
+        for (let i = 0; i < 5; i++) {
+            fs.appendFileSync(
+                outputFilePath,
+                JSON.stringify(data[i], null, 2) + ',\n'
+            );
+        }
         InCommingData = true;
         // resetting the time counter
         timeCtr = 0;
