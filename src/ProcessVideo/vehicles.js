@@ -64,7 +64,6 @@ class Vehicles {
             this.shipTilt = this.boosterTilt;
             this.shiploxPercent = 97.0;
             this.shipch4Percent = 95.0;
-            this.shiploxPercent = 0;
         } else {
             if (totalSeconds > 420) {
                 if (words.length == 4) {

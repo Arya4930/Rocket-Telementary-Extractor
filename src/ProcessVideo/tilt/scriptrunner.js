@@ -1,10 +1,22 @@
 import { CropImagesToAnalyze } from '../../utils/Functions.js';
 import { tiltWorkerPool } from '../workerpool.js';
 
-export async function GetTilt(img) {
+export async function GetTilt(img, i) {
     const regions = [
-        { name: 'Boostertilt', left: 550, top: 3, width: 180, height: 180 },
-        { name: 'Shiptilt', left: 1169, top: 3, width: 180, height: 180 }
+        {
+            name: 'Boostertilt',
+            left: 550,
+            top: 3 + 190 * i,
+            width: 180,
+            height: 180
+        },
+        {
+            name: 'Shiptilt',
+            left: 1169,
+            top: 3 + 190 * i,
+            width: 180,
+            height: 180
+        }
     ];
 
     const fileNames = await CropImagesToAnalyze(img, regions);

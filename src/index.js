@@ -70,10 +70,13 @@ async function main() {
         const files = fs
             .readdirSync(directoryPath)
             .filter((file) => /^frame_\d{5}\.png$/.test(file));
+        const mergedFiles = fs
+            .readdirSync(directoryPath)
+            .filter((file) => /^frames_\d{5}\.png$/.test(file));
 
-        if (!files.length) {
+        if (!files.length && !mergedFiles.length) {
             console.log('\n🚀 Extracting frames from video...');
-            await extractFrames(videoPath, directoryPath);
+            await extractFrames(videoPath, directoryPath, title);
         }
         const allfiles2 = await fs.promises.readdir(alltitlefiles);
         if (!allfiles2.includes('results.json')) {

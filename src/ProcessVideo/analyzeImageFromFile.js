@@ -155,39 +155,62 @@ export default async function analyzeImageFromFile(
         if (rocketType === 'Starship') {
             if (Temptime) time = IncremenetTimeBy1second(Temptime);
             if (InCommingData) {
-                const regions = [
-                    {
-                        name: 'boosterStats',
-                        left: 350,
-                        top: 15,
-                        width: 100,
-                        height: 75
-                    },
-                    {
-                        name: 'ShipStats',
-                        left: 1530,
-                        top: 15,
-                        width: 100,
-                        height: 75
-                    }
-                ];
+                const allTelemetryData = [];
 
-                const fileNames = await CropImagesToAnalyze(imagePath, regions);
-                [words, Fuel, Tilt, Engines] = await Promise.all([
-                    Promise.all(
-                        fileNames.map((file) =>
-                            Promise.race([
-                                getWordsFromAzure(file)
-                                // getWordsFromTesseract(file, true)
-                            ])
-                        )
-                    ).then((res) => res.flat()),
+                for (let i = 0; i < 5; i++) {
+                    const regions = [
+                        {
+                            name: 'boosterStats',
+                            left: 350,
+                            top: 15 + 190 * i,
+                            width: 100,
+                            height: 75
+                        },
+                        {
+                            name: 'ShipStats',
+                            left: 1530,
+                            top: 15 + 190 * i,
+                            width: 100,
+                            height: 75
+                        }
+                    ];
 
-                    GetFuel(imagePath),
-                    GetTilt(imagePath),
-                    GetEngines(imagePath)
-                ]);
-                fileNames.map((file) => fs.unlinkSync(file));
+                    const fileNames = await CropImagesToAnalyze(
+                        imagePath,
+                        regions
+                    );
+                    const [words, Fuel, Tilt, Engines] = await Promise.all([
+                        Promise.all(
+                            fileNames.map((file) =>
+                                Promise.race([
+                                    getWordsFromAzure(file)
+                                    // getWordsFromTesseract(file, true)
+                                ])
+                            )
+                        ).then((res) => res.flat()),
+
+                        GetFuel(imagePath, i),
+                        GetTilt(imagePath, i),
+                        GetEngines(imagePath, i)
+                    ]);
+
+                    fileNames.map((file) => fs.unlinkSync(file));
+                    Temptime = IncremenetTimeBy1second(Temptime);
+                    time = Temptime;
+                    if (words == 0) continue;
+
+                    const telemetryData = vehicleInstances.starship(
+                        words,
+                        time,
+                        Fuel,
+                        Tilt,
+                        Engines,
+                        InCommingData
+                    );
+
+                    allTelemetryData.push(telemetryData);
+                }
+                return Object.values(allTelemetryData);
             }
             if (words == 0) return;
             return vehicleInstances.starship(
