@@ -1,9 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import getFirstMp4File from '../getVideo/getvidfile.js';
-import getExcelSheet from '../finalize/getExcelSheet.js';
 import sharp from 'sharp';
-const __dirname = import.meta.dirname;
 
 export function IncremenetTimeBy1second(time) {
     let timeParts = time.split(':');
