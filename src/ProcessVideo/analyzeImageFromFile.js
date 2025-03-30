@@ -18,7 +18,7 @@ const vehicleInstances = new Vehicles();
 
 const features = ['Read'];
 
-async function getWordsFromAzure(imagePath) {
+export async function getWordsFromAzure(imagePath) {
     try {
         const imageData = fs.readFileSync(imagePath);
         const result = await client.path('/imageanalysis:analyze').post({
@@ -158,14 +158,11 @@ export default async function analyzeImageFromFile(
                 const allTelemetryData = [];
 
                 for (let i = 0; i < 5; i++) {
-                    const regions = [
-                        {
-                            name: 'boosterStats',
-                            left: 350,
-                            top: 15 + 190 * i,
-                            width: 100,
-                            height: 75
-                        },
+                    const timeParts = time.split(':').map(Number);
+                    const totalSeconds =
+                        timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2];
+
+                    let regions = [
                         {
                             name: 'ShipStats',
                             left: 1530,
@@ -174,6 +171,15 @@ export default async function analyzeImageFromFile(
                             height: 75
                         }
                     ];
+                    if (totalSeconds <= 420) {
+                        regions.unshift({
+                            name: 'boosterStats',
+                            left: 350,
+                            top: 15 + 190 * i,
+                            width: 100,
+                            height: 75
+                        });
+                    }
 
                     const fileNames = await CropImagesToAnalyze(
                         imagePath,
@@ -189,9 +195,9 @@ export default async function analyzeImageFromFile(
                             )
                         ).then((res) => res.flat()),
 
-                        GetFuel(imagePath, i),
-                        GetTilt(imagePath, i),
-                        GetEngines(imagePath, i)
+                        GetFuel(imagePath, i, totalSeconds),
+                        GetTilt(imagePath, i, totalSeconds),
+                        GetEngines(imagePath, i, totalSeconds)
                     ]);
 
                     fileNames.map((file) => fs.unlinkSync(file));

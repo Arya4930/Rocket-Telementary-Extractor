@@ -65,21 +65,29 @@ class Vehicles {
             this.shiploxPercent = 97.0;
             this.shipch4Percent = 95.0;
         } else {
-            if (totalSeconds > 420) {
-                if (words.length == 4) {
-                } else if (words.length == 2) {
-                    this.ship_speed = words[0] ? words[0] : 0;
-                    this.ship_altitude = words[1] ? words[1] : 0;
-                }
+            if (words.length == 2) {
+                this.ship_speed = words[0] ? words[0] : 0;
+                this.ship_altitude = words[1] ? words[1] : 0;
             }
-            this.shipEngines = Engines[1];
-            this.shiploxPercent = parseFloat(
-                parseFloat(Fuel[2]).toFixed(2) - 0.42
-            );
-            this.shipch4Percent = parseFloat(
-                parseFloat(Fuel[3]).toFixed(2) - 0.42
-            );
-            this.shipTilt = parseFloat(Tilt[1]).toFixed(2);
+            if (totalSeconds > 420) {
+                this.shipEngines = Engines[0];
+                this.shiploxPercent = parseFloat(
+                    parseFloat(Fuel[0]).toFixed(2) - 0.42
+                );
+                this.shipch4Percent = parseFloat(
+                    parseFloat(Fuel[1]).toFixed(2) - 0.42
+                );
+                this.shipTilt = parseFloat(Tilt[0]).toFixed(2);
+            } else {
+                this.shipEngines = Engines[1];
+                this.shiploxPercent = parseFloat(
+                    parseFloat(Fuel[2]).toFixed(2) - 0.42
+                );
+                this.shipch4Percent = parseFloat(
+                    parseFloat(Fuel[3]).toFixed(2) - 0.42
+                );
+                this.shipTilt = parseFloat(Tilt[1]).toFixed(2);
+            }
         }
 
         const telemetryData = {
