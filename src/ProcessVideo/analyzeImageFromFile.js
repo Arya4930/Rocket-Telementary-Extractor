@@ -87,7 +87,7 @@ export default async function analyzeImageFromFile(
                 words = await getWordsFromAzure(imagePath);
             } else {
                 words = await Promise.race([
-                    getWordsFromAzure(imagePath),
+                    // getWordsFromAzure(imagePath),
                     getWordsFromTesseract(imagePath)
                 ]).then((res) => res.flat());
             }
@@ -99,30 +99,6 @@ export default async function analyzeImageFromFile(
                 {
                     regex: /^T\+\d{2}[:.]\d{2}[:.]\d{2}$/,
                     transform: (text) => text.substring(2).replace('.', ':')
-                },
-                {
-                    regex: /^\d{1,2}:\d{2}:\d{2}$/,
-                    transform: (text) => text
-                },
-                {
-                    regex: /^:\d{1,2}:\d{2}$/,
-                    transform: (text) => `00${text}`
-                },
-                {
-                    regex: /^\d{1,2}:\d{2}$/,
-                    transform: (text) => `00:${text}`
-                },
-                {
-                    regex: /^\d{3}:\d{2}$/,
-                    transform: (text) => `00:${text.substring(1)}`
-                },
-                {
-                    regex: /^\+\d{1,2}:\d{2}:\d{2}$/,
-                    transform: (text) => text.substring(1)
-                },
-                {
-                    regex: /^[A-Z]{2}:\d{2}:\d{2}$/,
-                    transform: (text) => `00${text.substring(2)}`
                 }
             ];
 
@@ -131,7 +107,7 @@ export default async function analyzeImageFromFile(
             for (const word of words) {
                 const SeperatedWords = word.split(` `);
                 for (const SeperatedWord of SeperatedWords) {
-                    if (/^T\-\d{1,2}:\d{2}:\d{2}$/.test(SeperatedWord)) {
+                    if (/^T\-\d{2}:\d{2}:\d{2}$/.test(SeperatedWord)) {
                         const t = SeperatedWord.substring(2)
                             .split(':')
                             .map((e) => Number(e));
@@ -153,7 +129,7 @@ export default async function analyzeImageFromFile(
         }
 
         if (rocketType === 'Starship') {
-            if (Temptime) time = IncremenetTimeBy1second(Temptime);
+            if (!time && Temptime) time = Temptime;
             if (InCommingData) {
                 const allTelemetryData = [];
 
@@ -189,8 +165,8 @@ export default async function analyzeImageFromFile(
                         Promise.all(
                             fileNames.map((file) =>
                                 Promise.race([
-                                    getWordsFromAzure(file)
-                                    // getWordsFromTesseract(file, true)
+                                    // getWordsFromAzure(file)
+                                    getWordsFromTesseract(file, true)
                                 ])
                             )
                         ).then((res) => res.flat()),
@@ -201,9 +177,27 @@ export default async function analyzeImageFromFile(
                     ]);
 
                     fileNames.map((file) => fs.unlinkSync(file));
-                    Temptime = IncremenetTimeBy1second(Temptime);
-                    time = Temptime;
-                    if (words == 0) continue;
+                    if (words == 0) {
+                        const emptData = {
+                            time: time,
+                            ship_speed: 0,
+                            ship_altitude: 0,
+                            ship_LOX_Percent: 0,
+                            ship_CH4_Percent: 0,
+                            ship_Tilt: 0,
+                            ship_engines: 0,
+                            ...(totalSeconds <= 420 && {
+                                booster_speed: 0,
+                                booster_altitude: 0,
+                                booster_LOX_Percent: 0,
+                                booster_CH4_Percent: 0,
+                                booster_tilt: 0,
+                                booster_engines: 0
+                            })
+                        };
+                        allTelemetryData.push(emptData);
+                        continue;
+                    }
 
                     const telemetryData = vehicleInstances.starship(
                         words,
@@ -213,6 +207,9 @@ export default async function analyzeImageFromFile(
                         Engines,
                         InCommingData
                     );
+
+                    Temptime = IncremenetTimeBy1second(Temptime);
+                    time = Temptime;
 
                     allTelemetryData.push(telemetryData);
                 }

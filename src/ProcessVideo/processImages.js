@@ -5,7 +5,10 @@ import chalk from 'chalk';
 import CropAll from '../utils/Croplmages.js';
 import sharp from 'sharp';
 import analyzeImageFromFile from './analyzeImageFromFile.js';
-import { saveLatestFrame } from '../utils/Functions.js';
+import {
+    saveLatestFrame,
+    IncremenetTimeBy1second
+} from '../utils/Functions.js';
 import {
     getWordsFromAzure,
     getWordsFromTesseract
@@ -97,6 +100,13 @@ export default async function processImages(
                     ? Object.values(data).slice(1)
                     : [];
 
+            if (isInt(data)) {
+                skipCount = data;
+                console.log(`Skipping next ${skipCount} files...`);
+                fs.unlinkSync(filePath);
+                continue;
+            }
+
             if (
                 !data ||
                 (Array.isArray(values) &&
@@ -113,19 +123,32 @@ export default async function processImages(
                 continue;
             }
 
-            if (
-                typeof data === 'number' &&
-                isInt(data) &&
-                !incomingData &&
-                data.time !== '00:00:00'
-            ) {
-                skipCount = data - 1;
-                console.log(`Skipping next ${skipCount} files...`);
-                fs.unlinkSync(filePath);
-                continue;
-            }
+            if (isMerged) {
+                const outputPath = path.join(directoryPath, `getTime.png`);
+                await sharp(filePath)
+                    .extract({
+                        left: 854,
+                        top: 55 + 760,
+                        width: 216,
+                        height: 46
+                    })
+                    .toFile(outputPath);
 
-            time = isMerged ? data[4]?.time : data.time;
+                const extractedText = await getWordsFromTesseract(outputPath);
+                fs.unlinkSync(outputPath);
+                if (extractedText.length > 0) {
+                    time = extractedText[0].substring(2);
+                } else {
+                    time = 'NaN:NaN:NaN';
+                }
+                const timeRegex = /^\d{2}:\d{2}:\d{2}$/;
+                if (!timeRegex.test(time)) {
+                    time = data[4].time;
+                }
+            } else {
+                time = data.time;
+            }
+            time = IncremenetTimeBy1second(time);
             if (isMerged) {
                 for (let i = 0; i < 5; i++) {
                     fs.appendFileSync(
@@ -133,11 +156,6 @@ export default async function processImages(
                         JSON.stringify(data[i], null, 2) + ',\n'
                     );
                 }
-            } else {
-                fs.appendFileSync(
-                    outputFilePath,
-                    JSON.stringify(...data, null, 2) + ',\n'
-                );
             }
 
             incomingData = true;
@@ -146,7 +164,7 @@ export default async function processImages(
             if (!firstTimeData) {
                 await CropAll(directoryPath);
                 firstTimeData = true;
-                break;
+                return;
             }
         }
     }

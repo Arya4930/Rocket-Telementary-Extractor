@@ -2,6 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { createCanvas, loadImage } from 'canvas';
+import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
+import os from 'os';
 
 const __dirname = import.meta.dirname;
 const BLACK_BG_PATH = path.join(__dirname, '../../black_background.jpg');
