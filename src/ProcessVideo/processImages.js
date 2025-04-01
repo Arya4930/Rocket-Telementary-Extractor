@@ -164,19 +164,22 @@ export default async function processImages(
             if (!firstTimeData) {
                 await CropAll(directoryPath);
                 firstTimeData = true;
-                return;
+                break;
             }
         }
     }
 
-    // Process regular and merged images
-    await processFileList(files);
-    await processFileList(
-        fs
-            .readdirSync(directoryPath)
-            .filter((file) => /^frames_\d{5}\.png$/.test(file)),
-        true
-    );
+    try {
+        await processFileList(files);
+        await processFileList(
+            fs
+                .readdirSync(directoryPath)
+                .filter((file) => /^frames_\d{5}\.png$/.test(file)),
+            true
+        );
+    } catch (err) {
+        console.error('Error occurred in processing files:', err);
+    }
 
     // Clean up JSON output
     let outputData = fs
