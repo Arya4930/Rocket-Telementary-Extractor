@@ -54,16 +54,16 @@ export async function fixjson(jsonData, sheet) {
                 rowIndex,
                 'S_CH4'
             );
-            jsonData[rowIndex].booster_tilt = await VerifyTilt(
-                jsonData,
-                rowIndex,
-                'B'
-            );
-            jsonData[rowIndex].ship_Tilt = await VerifyTilt(
-                jsonData,
-                rowIndex,
-                'S'
-            );
+            // jsonData[rowIndex].booster_tilt = await VerifyTilt(
+            //     jsonData,
+            //     rowIndex,
+            //     'B'
+            // );
+            // jsonData[rowIndex].ship_Tilt = await VerifyTilt(
+            //     jsonData,
+            //     rowIndex,
+            //     'S'
+            // );
         }
 
         await saveJsonToFile(jsonData, sheet);

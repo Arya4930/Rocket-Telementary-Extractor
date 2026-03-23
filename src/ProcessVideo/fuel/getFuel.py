@@ -15,7 +15,7 @@ if image is None:
     sys.exit(1)
 
 target_color = np.array([40, 40, 40])
-tolerance = 20
+tolerance = 25
 first_target_point = None
 
 for x in range(len(image[0])):

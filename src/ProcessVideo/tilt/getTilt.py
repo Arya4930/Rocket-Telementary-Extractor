@@ -35,40 +35,38 @@ if len(x_coords) > 1 and len(y_coords) > 1:
         angles[1] += 90
     elif angles[1] > 45:
         angles[1] -= 90
-    
-    if angles[1] > 75:
-        angles[1] -= 180
     print(angles[1])
 
-    mean_x = np.mean(x_coords)
-    mean_y = np.mean(y_coords)
+    # Visuals and Debugging
+    # mean_x = np.mean(x_coords)
+    # mean_y = np.mean(y_coords)
 
-    # Plotting
-    plt.figure(figsize=(8, 6))
-    plt.scatter(x_coords, y_coords, alpha=0.6, marker='o', label="Data Points")
-    plt.scatter(mean_x, mean_y, color="red", marker="x", label="Mean Point", s=100)
+    # # Plotting
+    # plt.figure(figsize=(8, 6))
+    # plt.scatter(x_coords, y_coords, alpha=0.6, marker='o', label="Data Points")
+    # plt.scatter(mean_x, mean_y, color="red", marker="x", label="Mean Point", s=100)
 
-    scale_factor = 2
-    for i in range(2):
-        eigenvector = eigenvectors[:, i] * np.sqrt(eigenvalues[i]) * scale_factor
-        plt.quiver(
-            mean_x, mean_y,
-            eigenvector[0], eigenvector[1],
-            color=['green', 'blue'][i], angles='xy', scale_units='xy', scale=1,
-            width=0.005, label=f"Eigenvector {i+1} (λ={eigenvalues[i]:.2f})"
-        )
+    # scale_factor = 2
+    # for i in range(2):
+    #     eigenvector = eigenvectors[:, i] * np.sqrt(eigenvalues[i]) * scale_factor
+    #     plt.quiver(
+    #         mean_x, mean_y,
+    #         eigenvector[0], eigenvector[1],
+    #         color=['green', 'blue'][i], angles='xy', scale_units='xy', scale=1,
+    #         width=0.005, label=f"Eigenvector {i+1} (λ={eigenvalues[i]:.2f})"
+    #     )
 
-    plt.xlabel("X Coordinate")
-    plt.ylabel("Y Coordinate")
-    plt.title("Eigenvectors Overlaid on Original Data Pattern")
-    plt.legend()
-    plt.grid(True)
-    plt.axis("equal")
-    plt.gca().invert_yaxis()  # Flip Y to match OpenCV view
-    filename = os.path.splitext(os.path.basename(image_path))[0]
-    output_plot_path = f"./eigenvector.png"
-    plt.savefig(output_plot_path, dpi=300)
-    plt.close() 
+    # plt.xlabel("X Coordinate")
+    # plt.ylabel("Y Coordinate")
+    # plt.title("Eigenvectors Overlaid on Original Data Pattern")
+    # plt.legend()
+    # plt.grid(True)
+    # plt.axis("equal")
+    # plt.gca().invert_yaxis()  # Flip Y to match OpenCV view
+    # filename = os.path.splitext(os.path.basename(image_path))[0]
+    # output_plot_path = f"./eigenvector.png"
+    # plt.savefig(output_plot_path, dpi=300)
+    # plt.close() 
 else:
     print(0)
     sys.exit(1)

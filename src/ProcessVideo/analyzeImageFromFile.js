@@ -87,7 +87,7 @@ export default async function analyzeImageFromFile(
                 words = await getWordsFromAzure(imagePath);
             } else {
                 words = await Promise.race([
-                    // getWordsFromAzure(imagePath),
+                    // getWordsFromAzure(imagePath)
                     getWordsFromTesseract(imagePath)
                 ]).then((res) => res.flat());
             }

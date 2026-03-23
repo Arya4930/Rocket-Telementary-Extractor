@@ -12,6 +12,7 @@ import getFirstMp4File from './getVideo/getvidfile.js';
 import { getVideoTitle } from './getVideo/downloadvideo.js';
 import DownloadVideo from './getVideo/downloadvideo.js';
 import { finalizeJsonFile } from './finalize/finalizeJson.js';
+import { spawn } from 'child_process';
 
 const argv = minimist(process.argv.slice(2));
 ffmpeg.setFfmpegPath(ffmpegPath.path);
@@ -80,6 +81,14 @@ async function main() {
         }
         const allfiles2 = await fs.promises.readdir(alltitlefiles);
         if (!allfiles2.includes('results.json')) {
+            const plotProcess = spawn('python', ['plot.py', title], {
+                cwd: __dirname, // run from root (where plot.py exists)
+                stdio: 'inherit'
+            });
+
+            plotProcess.on('error', (err) => {
+                console.error('❌ Failed to start plot.py:', err);
+            });
             await processImages(directoryPath, outputFilePath, rocketType);
         }
         getExcelSheet(outputFilePath, excelPath);
