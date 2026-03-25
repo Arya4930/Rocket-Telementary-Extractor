@@ -3,12 +3,14 @@ class Vehicles {
     constructor() {
         this.booster_speed = 0.0;
         this.booster_altitude = 0.0;
+        this.boosterAcceleration = 0.0;
         this.ship_speed = 0.0;
         this.ship_altitude = 0.0;
+        this.shipAcceleration = 0.0;
         this.boosterloxPercent = 97.0;
         this.boosterch4Percent = 95.0;
-        this.shiploxPercent = 100.0;
-        this.shipch4Percent = 100.0;
+        this.shiploxPercent = 97.0;
+        this.shipch4Percent = 95.0;
         this.boosterTilt = 90.0;
         this.shipTilt = 90.0;
         this.boosterEngines = 0;
@@ -20,9 +22,12 @@ class Vehicles {
             ship_altitude: [0, 0, 0, 0, 0],
             boosterloxPercent: [97.0, 97.0, 97.0, 97.0, 97.0],
             boosterch4Percent: [95.0, 95.0, 95.0, 95.0, 95.0],
-            shiploxPercent: [100.0, 100.0, 100.0, 100.0, 100.0],
-            shipch4Percent: [100.0, 100.0, 100.0, 100.0, 100.0]
+            shiploxPercent: [97.0, 97.0, 97.0, 97.0, 97.0],
+            shipch4Percent: [95.0, 95.0, 95.0, 95.0, 95.0],
+            boosterAcceleration: [0, 0, 0, 0, 0],
+            shipAcceleration: [0, 0, 0, 0, 0]
         };
+        this.strikes = 0;
     }
 
     starship(words, time, Fuel, Tilt, Engines, InCommingData) {
@@ -53,38 +58,70 @@ class Vehicles {
                 }
             }
         } else {
+            if (this.isBadData(words)) {
+                this.strikes++;
+            } else {
+                this.strikes = 0;
+            }
+
+            if (this.strikes >= 30) {
+                console.log('⚠️ RESETTING SYSTEM (Bad OCR data)');
+
+                for (let key in this.history) {
+                    this.history[key] = Array(5).fill(0);
+                }
+
+                this.booster_speed = 0;
+                this.booster_altitude = 0;
+                this.ship_speed = 0;
+                this.ship_altitude = 0;
+                this.boosterAcceleration = 0;
+                this.shipAcceleration = 0;
+
+                this.strikes = 0;
+                InCommingData = false;
+            }
+
             this.booster_speed = this.updateQueue(
                 'booster_speed',
-                parseFloat(words[0]) || 0,
+                Math.abs(parseFloat(words[0]) || 0),
                 300 // threshold for speed spike
             );
             this.booster_altitude = this.updateQueue(
                 'booster_altitude',
-                parseFloat(words[1]) || 0,
+                Math.abs(parseFloat(words[1]) || 0),
                 3 // altitude changes slower
             );
             this.ship_speed = this.updateQueue(
                 'ship_speed',
-                parseFloat(words[2]) || 0,
+                Math.abs(
+                    parseFloat(
+                        totalSeconds > 160 ? words[2] : this.booster_speed
+                    ) || 0
+                ),
                 300
             );
             this.ship_altitude = this.updateQueue(
                 'ship_altitude',
-                parseFloat(words[3]) || 0,
+                Math.abs(
+                    parseFloat(
+                        totalSeconds > 160 ? words[3] : this.booster_altitude
+                    ) || 0
+                ),
                 3
             );
         }
 
         this.boosterloxPercent = this.updateQueue(
             'boosterloxPercent',
-            parseFloat(Fuel[0]),
-            2
+            Math.abs(parseFloat(Fuel[0]) || 0),
+            5
         );
 
         this.boosterch4Percent = this.updateQueue(
             'boosterch4Percent',
-            parseFloat(Fuel[1]),
-            2
+            Math.abs(parseFloat(Fuel[1]) || 0),
+            5
         );
         this.boosterTilt = parseFloat(Tilt[0]).toFixed(2);
         if (this.boosterTilt > 75) this.boosterTilt -= 180;
@@ -100,12 +137,12 @@ class Vehicles {
             if (words.length == 2) {
                 this.ship_speed = this.updateQueue(
                     'ship_speed',
-                    parseFloat(words[0]) || 0,
+                    Math.abs(parseFloat(words[0]) || 0),
                     300
                 );
                 this.ship_altitude = this.updateQueue(
                     'ship_altitude',
-                    parseFloat(words[1]) || 0,
+                    Math.abs(parseFloat(words[1]) || 0),
                     3
                 );
             }
@@ -113,37 +150,56 @@ class Vehicles {
                 this.shipEngines = Engines[0];
                 this.shiploxPercent = this.updateQueue(
                     'shiploxPercent',
-                    parseFloat(Fuel[2]),
-                    2
+                    Math.abs(parseFloat(Fuel[2]) || 0),
+                    5
                 );
 
                 this.shipch4Percent = this.updateQueue(
                     'shipch4Percent',
-                    parseFloat(Fuel[3]),
-                    2
+                    Math.abs(parseFloat(Fuel[3]) || 0),
+                    5
                 );
                 this.shipTilt = parseFloat(Tilt[0]).toFixed(2);
             } else {
                 this.shipEngines = Engines[1];
                 this.shiploxPercent = this.updateQueue(
                     'shiploxPercent',
-                    parseFloat(Fuel[2]),
-                    2
+                    Math.abs(parseFloat(Fuel[2]) || 0),
+                    5
                 );
 
                 this.shipch4Percent = this.updateQueue(
                     'shipch4Percent',
-                    parseFloat(Fuel[3]),
-                    2
+                    Math.abs(parseFloat(Fuel[3]) || 0),
+                    5
                 );
                 this.shipTilt = parseFloat(Tilt[1]).toFixed(2);
             }
         }
+        const boosterAcceleration = parseFloat(
+            ((this.booster_speed -
+                this.history.booster_speed[
+                    this.history.booster_speed.length - 2
+                ]) /
+                0.1) *
+                0.1
+        );
+        this.boosterAcceleration = boosterAcceleration;
+        const shipAcceleration = parseFloat(
+            ((this.ship_speed -
+                this.history.ship_speed[this.history.ship_speed.length - 2]) /
+                0.1) *
+                0.1
+        );
+        this.shipAcceleration = shipAcceleration;
+        if (totalSeconds < 160)
+            this.shipAcceleration = this.boosterAcceleration;
 
         const telemetryData = {
             time: time || 'Not found',
             ship_speed: parseInt(this.ship_speed) || 0,
             ship_altitude: parseInt(this.ship_altitude) || 0,
+            ship_acceleration: parseFloat(this.shipAcceleration) || 0,
             ship_LOX_Percent: this.shiploxPercent,
             ship_CH4_Percent: this.shipch4Percent,
             ship_Tilt: parseFloat(this.shipTilt),
@@ -151,6 +207,7 @@ class Vehicles {
             ...(totalSeconds <= 420 && {
                 booster_speed: parseInt(this.booster_speed) || 0,
                 booster_altitude: parseInt(this.booster_altitude) || 0,
+                booster_acceleration: parseFloat(this.boosterAcceleration) || 0,
                 booster_LOX_Percent: this.boosterloxPercent,
                 booster_CH4_Percent: this.boosterch4Percent,
                 booster_tilt: parseFloat(this.boosterTilt),
@@ -192,17 +249,9 @@ class Vehicles {
             recentTrend += queue[i] - queue[i - 1];
         }
 
-        const avgTrend = recentTrend / (queue.length - 1);
-
-        const isDirectionFlip =
-            Math.sign(diff) !== Math.sign(avgTrend) &&
-            Math.abs(diff) > threshold;
-
         const isSpike = Math.abs(diff) > threshold;
 
         if (!isSpike) {
-            queue.push(newValue);
-        } else if (isDirectionFlip && Math.abs(diff) > threshold * 2) {
             queue.push(newValue);
         } else {
             let slopeSum = 0;
@@ -219,6 +268,27 @@ class Vehicles {
         if (queue.length > 5) queue.shift();
 
         return queue[queue.length - 1];
+    }
+
+    isBadData(words) {
+        if (!words || words.length === 0) return true;
+
+        let badCount = 0;
+
+        for (let w of words) {
+            if (
+                w === null ||
+                w === undefined ||
+                w === '' ||
+                w === 0 ||
+                w === '0' ||
+                isNaN(parseFloat(w))
+            ) {
+                badCount++;
+            }
+        }
+
+        return badCount / words.length >= 0.8;
     }
 
     falcon9(words, time) {

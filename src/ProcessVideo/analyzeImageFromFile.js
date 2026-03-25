@@ -84,7 +84,10 @@ export default async function analyzeImageFromFile(
         let time = null;
         if (!InCommingData && !Temptime) {
             if (isPlusTime) {
-                words = await getWordsFromAzure(imagePath);
+                words = await Promise.race([
+                    // getWordsFromAzure(imagePath)
+                    getWordsFromTesseract(imagePath)
+                ]).then((res) => res.flat());
             } else {
                 words = await Promise.race([
                     // getWordsFromAzure(imagePath)
@@ -103,7 +106,7 @@ export default async function analyzeImageFromFile(
             ];
 
             let plustime = 0;
-
+            console.log(words);
             for (const word of words) {
                 const SeperatedWords = word.split(` `);
                 for (const SeperatedWord of SeperatedWords) {
@@ -161,7 +164,7 @@ export default async function analyzeImageFromFile(
                         imagePath,
                         regions
                     );
-                    const [words, Fuel, Tilt, Engines] = await Promise.all([
+                    let [words, Fuel, Tilt, Engines] = await Promise.all([
                         Promise.all(
                             fileNames.map((file) =>
                                 Promise.race([
@@ -178,25 +181,7 @@ export default async function analyzeImageFromFile(
 
                     fileNames.map((file) => fs.unlinkSync(file));
                     if (words == 0) {
-                        const emptData = {
-                            time: time,
-                            ship_speed: 0,
-                            ship_altitude: 0,
-                            ship_LOX_Percent: 0,
-                            ship_CH4_Percent: 0,
-                            ship_Tilt: 0,
-                            ship_engines: 0,
-                            ...(totalSeconds <= 420 && {
-                                booster_speed: 0,
-                                booster_altitude: 0,
-                                booster_LOX_Percent: 0,
-                                booster_CH4_Percent: 0,
-                                booster_tilt: 0,
-                                booster_engines: 0
-                            })
-                        };
-                        allTelemetryData.push(emptData);
-                        continue;
+                        words = Array(10).fill(0);
                     }
 
                     const telemetryData = vehicleInstances.starship(

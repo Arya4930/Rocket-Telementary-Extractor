@@ -15,23 +15,8 @@ folder = sys.argv[1] if len(sys.argv) > 1 else "IFT-8"
 results_path = os.path.join(ROOT_DIR, folder, "results.json")
 image_path = os.path.join(ROOT_DIR, folder, "video-dataset", "latest.png")
 
-# ================= PLOT SETUP =================
-
 plt.ion()
-
 fig = plt.figure(figsize=(14, 8))
-
-# Grid: 2x3 (extra column for image)
-gs = fig.add_gridspec(2, 3)
-
-ax_speed = fig.add_subplot(gs[0, 0])
-ax_alt = fig.add_subplot(gs[0, 1])
-ax_fuel = fig.add_subplot(gs[1, 0])
-ax_tilt = fig.add_subplot(gs[1, 1])
-
-ax_img = fig.add_subplot(gs[0, 2])   # image on top-right
-ax_text = fig.add_subplot(gs[1, 2])  # text below it
-
 plt.show(block=False)
 
 # ================= HELPERS =================
@@ -42,6 +27,31 @@ def parse_time(t):
         return h*3600 + m*60 + s
     except:
         return 0
+
+def smooth(arr, k=3):
+    out = []
+    for i in range(len(arr)):
+        start = max(0, i-k)
+        out.append(sum(arr[start:i+1]) / (i-start+1))
+    return out
+
+def is_data_ready(data):
+    if len(data) < 5:
+        return False
+
+    latest = data[-1]
+
+    required = [
+        "ship_speed",
+        "ship_altitude"
+    ]
+
+    for key in required:
+        val = latest.get(key)
+        if val is None:
+            return False
+
+    return True
 
 running = True
 
@@ -58,7 +68,6 @@ fig.canvas.mpl_connect('key_press_event', on_key)
 while running:
     try:
         if not os.path.exists(results_path):
-            print("Waiting for results.json...")
             time.sleep(0.5)
             continue
 
@@ -75,6 +84,43 @@ while running:
 
         if len(data) == 0:
             continue
+
+        ready = is_data_ready(data)
+
+        # ================= NOT READY → FULL IMAGE =================
+        if not ready:
+            fig.clear()
+
+            ax_full = fig.add_subplot(111)
+
+            if os.path.exists(image_path):
+                img = mpimg.imread(image_path)
+                ax_full.imshow(img)
+                ax_full.set_title("Waiting for telemetry...")
+            else:
+                ax_full.set_title("No Image Yet")
+
+            ax_full.axis("off")
+
+            plt.tight_layout()
+            plt.pause(0.1)
+            continue
+
+        # ================= READY → FULL DASHBOARD =================
+
+        fig.clear()
+
+        gs = fig.add_gridspec(3, 3)
+
+        ax_speed = fig.add_subplot(gs[0, 0])
+        ax_alt   = fig.add_subplot(gs[0, 1])
+        ax_acc   = fig.add_subplot(gs[0, 2])
+
+        ax_fuel  = fig.add_subplot(gs[1, 0])
+        ax_tilt  = fig.add_subplot(gs[1, 1])
+
+        ax_img   = fig.add_subplot(gs[1, 2])
+        ax_text  = fig.add_subplot(gs[2, :])
 
         # ================= EXTRACT =================
 
@@ -95,14 +141,14 @@ while running:
         ship_tilt = [d.get("ship_Tilt", 0) for d in data]
         booster_tilt = [d.get("booster_tilt", 0) for d in data]
 
+        ship_acc = [d.get("ship_acceleration", 0) for d in data]
+        booster_acc = [d.get("booster_acceleration", 0) for d in data]
+
+        # smooth acceleration
+        ship_acc = smooth(ship_acc)
+        booster_acc = smooth(booster_acc)
+
         latest = data[-1]
-
-        # ================= CLEAR =================
-
-        ax_speed.clear()
-        ax_alt.clear()
-        ax_fuel.clear()
-        ax_tilt.clear()
 
         # ================= PLOTS =================
 
@@ -120,6 +166,13 @@ while running:
         ax_alt.legend()
         ax_alt.grid()
 
+        # ACCELERATION
+        ax_acc.plot(times, ship_acc, label="Ship")
+        ax_acc.plot(times, booster_acc, label="Booster")
+        ax_acc.set_title("Acceleration")
+        ax_acc.legend()
+        ax_acc.grid()
+
         # FUEL
         ax_fuel.plot(times, ship_lox, label="Ship LOX")
         ax_fuel.plot(times, booster_lox, label="Booster LOX")
@@ -136,43 +189,36 @@ while running:
         ax_tilt.legend()
         ax_tilt.grid()
 
-        # ================= IMAGE =================
-
-        ax_img.clear()
+        # IMAGE
         if os.path.exists(image_path):
             img = mpimg.imread(image_path)
             ax_img.imshow(img)
             ax_img.set_title("Live Frame")
-            ax_img.axis("off")
         else:
             ax_img.set_title("No Image Yet")
-            ax_img.axis("off")
 
-        # ================= TEXT (LATEST VALUES) =================
+        ax_img.axis("off")
 
+        # TEXT
         text = f"""
 Time: {latest.get("time")}
+
 Ship Speed: {latest.get("ship_speed")}
 Booster Speed: {latest.get("booster_speed")}
 
 Ship Alt: {latest.get("ship_altitude")}
 Booster Alt: {latest.get("booster_altitude")}
 
+Ship Acc: {latest.get("ship_acceleration")}
+Booster Acc: {latest.get("booster_acceleration")}
+
 Ship Tilt: {latest.get("ship_Tilt")}
 Booster Tilt: {latest.get("booster_tilt")}
-
-Booster LOX: {latest.get("booster_LOX_Percent")}
-Booster CH4: {latest.get("booster_CH4_Percent")}
-
-Ship LOX: {latest.get("ship_LOX_Percent")}
-Ship CH4: {latest.get("ship_CH4_Percent")}
 """
 
-        ax_text.clear()
         ax_text.axis("off")
-
         ax_text.text(
-            0.05, 0.95, text,
+            0.01, 0.95, text,
             va='top',
             fontsize=10,
             family='monospace'

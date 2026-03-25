@@ -148,7 +148,9 @@ export default async function processImages(
             } else {
                 time = data.time;
             }
-            time = IncremenetTimeBy1second(time);
+            if (firstTimeData && incomingData) {
+                time = IncremenetTimeBy1second(time);
+            }
             if (isMerged) {
                 for (let i = 0; i < 5; i++) {
                     fs.appendFileSync(
