@@ -12,6 +12,31 @@
 
 This project leverages the Azure Vision API to extract telemetry data shown on the screen from frames, achieving a high accuracy of up to ~99.6%. However, due to the frame-by-frame analysis, the processing time can be significant (~2.5 hours for analyzing a 1-hour video).
 
+## Example Results
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/75e5cf28-8976-4362-8a55-c9467cf154bc" width="300px"></td>
+    <td><img src="https://github.com/user-attachments/assets/cd3269ea-31c8-4ab0-a50a-5f9bfa0a65e2" width="300px"></td>
+    <td><img src="https://github.com/user-attachments/assets/f5dcc229-325f-462c-8bc2-2118ebc01f67" width="300px"></td>
+  </tr>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/adf07350-e463-4f96-af94-8ee62f96d2fb" width="300px"></td>
+    <td><img src="https://github.com/user-attachments/assets/cc0d3aec-7cd0-4578-beed-1fa25157968f" width="300px"></td>
+    <td><img src="https://github.com/user-attachments/assets/cd2dac6a-f3f6-4e99-acd1-8c3d3218572a" width="300px"></td>
+  </tr>
+</table>
+
+## Data & Resources
+
+- **Compiled Results (Google Sheets)**  
+  https://docs.google.com/spreadsheets/d/1FRLHEwgT_gYEQ9AFiNjclH8KELPmgwzwTLacrbXSMuQ/edit?gid=448692991#gid=448692991  
+
+- **Dataset (Kaggle)**  
+  https://www.kaggle.com/datasets/arya2209/starship-launches-dataset-ift1-ift8/data  
+
+## Demo
+- ▶️ https://youtu.be/1Xxv6C2rCM0
+
 ## Requirements
 
 Before running the script, you need an Azure Vision API key. (You can get one [here](https://portal.vision.cognitive.azure.com/demo/extract-text-from-images)). After getting your key, follow these steps:
